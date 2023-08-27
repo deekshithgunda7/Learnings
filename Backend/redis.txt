@@ -1,0 +1,54 @@
+Basic Redis Intallation in  windows using windows sub system for linux
+Refer: https://www.youtube.com/watch?v=1psWME8UH_0
+
+$ sudo apt-add-repository ppa:redislabs/redis
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install redis-server
+
+Once installed, you can start, stop, and restart the server:
+
+$ sudo service redis-server start
+$ sudo service redis-server stop
+$ sudo service redis-server restart
+
+NOTE: If you have trouble with the command to start the server, you might need to turn daemonization on in your redis.conf. 
+To do that, open up /etc/redis/redis.conf and replace where it says "daemonize no" with "daemonize yes".
+
+-------------------------------------------------------------------------------------------------------------------
+
+Redis for nodejs
+
+Refer:https://www.youtube.com/watch?v=jgpVdJB2sKQ
+
+BASIC COMMANDS
+
+SET name deekshith 
+GET name
+DEL name
+EXISTS name -->returns true or false
+KEYS *
+flushall --->delete all keys
+ttl name
+expire name 10
+setex name 10 deekshith
+
+LISTS:
+lpush friends deekshith
+lrange friends 0 -1 ---->to get elements in list
+rpush friends nani
+lpop friends
+rpop friends
+
+SET:
+SADD hobbies "weight lifting" 
+SMEMBERS hobbies
+SREM hobbies "weight lifying"-->to remove
+
+HASH:
+HSET person name deekshith
+HGET person name
+HGETALL person
+HDEL person age
+HEXISTS person age
+

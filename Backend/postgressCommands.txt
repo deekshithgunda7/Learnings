@@ -1,0 +1,84 @@
+use---- \c databaseName ------>to connect to database
+use---- \h for help and press 'q' to back to terminal
+use---- \q to exit
+use---- \l to list databases
+use---- \d to list tables
+use---- \d 'tablename' ------->to describe table
+use---- \? to get all options in psql
+use---- \i filename ----->excute commands from file
+use---- \x----->expanded display
+use---- \df to list functions
+use---- \du to list roles
+
+CREATE ROLE me WITH LOGIN PASSWORD 'password';-------------------------------------------------------->create a role
+ALTER ROLE me CREATEDB;-------------------------------------------------------------------------------->now role 'me' able to create DB
+SELECT * from pg.available.extensions;---------------------------------------------------------------->list of extentions
+CREATE EXTENTION IF NOT EXISTS 'UUID-ASSP';----------------------------------------------------------->create uuid extention
+
+-------------------------------------------
+http://localhost:3000/users    --get
+http://localhost:3000/users/1  --get by id
+http://localhost:3000/users    --post
+http://localhost:3000/users/1  --put by id
+http://localhost:3000/users/1  --delete by id
+-------------------------------------------
+
+cfs-serverless-poc
+  user: 'cfsadmin',
+  host: 'cfs-ds-svc-v2.cluster-cq28mf64bhy8.us-east-1.rds.amazonaws.com',
+  database: 'Cfs_DiscoverySvc_V2',
+  password: 'Password1!',
+  port: 5432
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT * FROM person ORDER BY country DESC;---------------------------------------------->ORDER BY-->ONE COL AT A TIME(BY DEFAULT ASC)
+SELECT DISTINCT country FROM  person ORDER BY country;----------------------------------->DISTINCT--->To get distinct values in a col
+SELECT  * FROM person WHERE gender='Female' AND 
+(country='China' OR country='Poland');--------------------------------------------------->WHERE CLAUSE AND AND--->it should satify both conditions(china and poland)
+SELECT 1<>2;----------------------------------------------------------------------------->return true-->'<>'-->not equal symbol
+SELECT  * FROM person OFFSET 5 LIMIT 10;------------------------------------------------->OFFSET will skip first 5 rows and limit will give 10 values after offset
+SELECT  * FROM person OFFSET 5 FETCH 10 ROWS ONLY;--------------------------------------->OFFSET will skip first 5 rows and FETCH will give 10 values after offset(sql standard)
+SELECT  * FROM person WHERE  country IN ('China','Japan','Indonesia') ;------------------>IN CLAUSE will array of values-->return persons from ('China','Japan','Indonesia')
+SELECT  * FROM person WHERE  date_of_birth BETWEEN DATE '2000-01-01' AND '2015-01-01';--->BETWEEN CLAUSE
+SELECT  * FROM person WHERE  email LIKE '%.com';------------------------------------------>LIKE clause-->will give all .com values
+SELECT  * FROM person WHERE  country ILIKE 'p%';------------------------------------------>ILIKE clause-->will give all country names start with p or P(case -sensitive)
+SELECT country,count(*) FROM person GROUP BY country;-------------------------------------->grouping and count of people;
+SELECT country,count(*) FROM person GROUP BY country HAVING COUNT(*)<5;-------------------->Gruoping and Having clause;
+SELECT COALESCE(email,'émail not found') from person;--------------------------------------->will fill 'email not found' in NULL values
+SELECT now();---------->current date-timestamp;
+SELECT now()::DATE;
+SELECT now()::TIME;
+SELECT now()-INTERVAL '1 YEAR';--->subtract one year from current timestamp;
+SELECT now()+INTERVAL '1 MONTH';--->add one month from current timestamp;
+SELECT EXTRACT(MONTH FROM now());
+ALTER TABLE person DROP CONSTRAINT person-pkey;-------------------------------------------------->drop a constarint
+ALTER TABLE person ADD PRIMARY KEY(id)------------------------------------------------------------>ADD constraint
+ALTER  TABLE person ADD CONSTARINT unique-email-address UNIQUE(email);----------------------------->unique emails
+ALTER TABLE person ADD CONSTARINT gender-constraint CHECK(GENDER='Female' OR GENDER='Male');-------->check constraint only for male and female
+SELECT * from person join car ON person.car_id=car.id;---------------------------------------------->INNER JOIN
+car_id BIGINT REFERENCES car(id)-------------------------------------------------------------------->Forign key creation
+ALTER TABLE  as_vpcendpoint_id
+ALTER COLUMN awsaccount_id TYPE BIGINT;--------------------------------------------------------------->alter datatype
+
+
+
+
+
+TODO:
+*explore more on sam
+*Understand tables and quries related to mock apis in springboot
+*create tables on psql
+*understand how to use lambda function and sam local
+*should learn more ExpressJs concepts
+
+sam init --no-interactive --runtime nodejs12.x --dependency-manager npm --output-dir . --name simple-node-api  --app-template hello-world
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ CREATE ROLE dk WITH LOGIN PASSWORD 'dk';
+
+
+
+
+
+

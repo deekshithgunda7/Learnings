@@ -1,0 +1,121 @@
+docker build . -t deekshith76/sampleapp
+
+To Run angular app which is containerized
+docker run -p 3009:80 deekshith76/sampleapp
+
+CTRL+C OR CTRL+D TO EXIT 
+//////////////////////////////////////////////////////////////
+
+Docker Images:
+-------------
+docker images --help
+docker images -f "dangling=false"  -------->containers not associated with running container
+docker images -f "dangling=true"
+docker images -q            ---------->show only imagesId's
+
+docker run image
+docker rmi -f imageid
+
+for ubuntu image----
+
+docker inspect ubuntu
+docker run --name Myubuntu1 -it ubuntu bash
+
+///////////////////////////////////////////////////////////////////////////////
+
+Docker File command:
+--------------------
+docker build -t myimg:1.0 .
+docker run image-id
+
+while performing this command you shoud be in current folder of docker file
+
+CREATING A DOCKERFILE:
+-----------------------
+
+1)specify a base Image
+2)run some commands to install some additional programs
+3)Specify a command to run on container startUp
+
+////////////////////////////////////////////////////////////////////////////////
+
+Docker-compose:
+--------------
+
+docker-compose config
+c
+docker-compose down
+docker-compose up --build -->rebuild the image
+for scaling up services:
+
+docker-compose up -d --scale database=4
+docker-compose ps   -->status of container and run the command in directory of docker-compose file
+////////////////////////////////////////////////////////////////
+envoy version..
+
+docker run --rm envoyproxy/envoy-dev:18db4c90e3295fb2c39bfc7b2ce641cfd6c3fbed --version
+
+/////////////////////////////////////////////////////////////////////////
+
+docker network create\
+    --driver bridge\
+    --subnet 182.18.0.0/16
+     custom-isolated-network
+
+docker network ls
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+conatiner commands
+------------------
+
+docker ps --all  --->print all containers that are shutdown .
+docker ps -a
+docker system prune  --->remove all the stopped containers and even from cache as well
+
+DOCKER RUN COMMAND =DOCKER CREATE + DOCKER START
+
+docker run imageNAMe
+       OR
+docker create imagename --->it gives containerId
+docker start -a containerId
+docker logs containerId --->will get data from that containerId,it will start or restart container,it just print data of the conatiner when it started and exited
+docker stop containerId-->will give some time to shutdown container
+docker kill conatinerId-->will stutdown container immedietly
+
+docker exec -it containerId "command"
+EX: docker exec -it containerId  redis-cli
+
+docker pause conatinerId
+docker unpause conatinerId
+docker top conatinerId
+docker stats conatainerId
+docker attach conatinerId
+docker rm conatinerID
+docker history conatinerID
+//////////////////////////////////////////////////////////////////////////////////////////////
+refer:https://medium.com/geekculture/using-redis-with-docker-and-nodejs-express-71dccd495fd3
+docker run -d --name <CONTAINER_NAME> -p 127.0.0.1:6379:6379 redis
+
+refer:https://stackoverflow.com/questions/43904562/docker-how-to-find-the-network-my-container-is-in
+docker inspect <CONTAINER_NAME> -f "{{json .NetworkSettings.Networks }}"
+docker network connect $network_name $container_name
+docker network disconnect $network_name $container_name
+docker network create $network_name
+docker exec -it containerId sh -->to start a shell
+docker run -it busybox sh
+//////////////////////////////////////////////
+for react app commands used:
+
+npm run build
+npm run test
+npm run start
+/c/Users/dgunda/AWS-UDEMY/DockerAndKubernetes/reactProject/frontend
+
+/////////////////////////////////////////
+open wsl
+cd ~
+explorer.exe .
+cd frontend
+docker build Dockerfile.dev .
+

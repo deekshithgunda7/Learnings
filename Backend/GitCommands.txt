@@ -1,0 +1,59 @@
+-----------------------------------------------------------------------------------
+GIT Commands
+------------------------------------------------------------------------------------
+cd existing_folder 
+git init 
+git status
+git remote add origin ssh://git@oxfordssh.awsdev.infor.com:7999/IONAPI/poc/cfs_node_aws_lambda.git
+git add .
+git commit -m "Initial commit"
+git push origin branch name
+     (OR)
+git push -u origin master 
+     (OR)
+git push origin branch name
+git push -u “url” master
+git clone ssh://git@oxfordssh.awsdev.infor.com:7999/IONAPI/poc/cfs_node_aws_lambda.git 
+git push origin branch name
+
+-----------------------------------------------------------------------------------
+git --version
+git config --global user.name “xxxx”
+git config --global user.name
+git config --global user.email “xxxx”
+git config --global user.email
+git config --global --list
+
+
+--------------------------------------------------------------------------------
+
+$ git checkout feature/CFSAUTHSCRM-16
+git push -u origin TestPoc
+
+git clone -b branchName ssh://git@oxfordssh.awsdev.infor.com:7999/IONAPI/poc/cfs_node_aws_lambda.git 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$ git clone ssh://git@oxfordssh.awsdev.infor.com:7999/cfs/infor-cfs-auth-service.git
+$ cd ïnfor-cfs-sam-poc/
+$ git checkout development
+$ git add .
+$ git commit -m 'initial commit'
+$ git push origin development
+ git push origin --delete feature/CFSAUTHSCRM-1
+
+$ git push origin feature/CFSAUTHSCRM-43
+ git commit -m 'CFSAUTHSCRM-43 Update the service to use password and tls to connect redis'
+
+
+
+
+
+
+
+
+
+
+
+
+
+

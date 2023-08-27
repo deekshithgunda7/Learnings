@@ -1,0 +1,43 @@
+The internet is not a fuzzy cloud. The internet is a wire, actually buried in the ground. Computers connected directly to the internet are called "Servers," while the computers you and I use are "clients," 
+because they are not connected directly to the internet, but through an Internet Service Provider. Routers shuttle packets of information across the 
+internet, and transmit e-mail, pictures, and web pages.
+
+How does Internet work?
+
+Refer below link:
+https://developer.mozilla.org/en-US/docs/Learn/Common_questions/How_does_the_Internet_work
+
+Video Link:
+https://www.youtube.com/watch?v=x3c1ih2NJEg
+
+As you might notice, when we browse the Web with a Web browser, we usually use the domain name to reach a website. 
+Does that mean the Internet and the Web are the same thing? It's not that simple. As we saw, the Internet is a technical infrastructure 
+which allows billions of computers to be connected all together. Among those computers, some computers (called Web servers) can send messages intelligible
+to web browsers. The Internet is an infrastructure, whereas the Web is a service built on top of the infrastructure.
+It is worth noting there are several other services built on top of the Internet, such as email and IRC.
+-------------------------------------------------------------------------------------------------------------------------------
+What is the difference between webpage, website, web server, and search engine?
+
+Refer below link:
+https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Pages_sites_servers_and_search_engines
+--------------------------------------------------------------------------------------------------------------------------------
+
+What is Web Server?
+
+Refer below link:
+https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_is_a_web_server
+---------------------------------------------------------------------------------------------------------------------------------
+What is Http ?
+
+Refer below link:
+https://developer.mozilla.org/en-US/docs/Web/HTTP
+---------------------------------------------------------------------------------------------------------------------------------
+How browser works in technical aspect?
+
+Refer below link:
+https://www.html5rocks.com/en/tutorials/internals/howbrowserswork/
+----------------------------------------------------------------------------------------------------------------------------------
+DNS OVERVIEW:
+
+Refer below link:
+https://www.youtube.com/watch?v=JkEYOt08-rU
