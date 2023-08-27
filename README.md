@@ -1,2 +1,2 @@
 # Learnings
-Understands some concepts and documenting it for future refernece
+Understands some concepts and documenting it for future reference
