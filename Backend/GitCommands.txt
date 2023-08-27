@@ -27,22 +27,10 @@ git config --global --list
 
 --------------------------------------------------------------------------------
 
-$ git checkout feature/CFSAUTHSCRM-16
-git push -u origin TestPoc
 
-git clone -b branchName ssh://git@oxfordssh.awsdev.infor.com:7999/IONAPI/poc/cfs_node_aws_lambda.git 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$ git clone ssh://git@oxfordssh.awsdev.infor.com:7999/cfs/infor-cfs-auth-service.git
-$ cd ïnfor-cfs-sam-poc/
-$ git checkout development
-$ git add .
-$ git commit -m 'initial commit'
-$ git push origin development
- git push origin --delete feature/CFSAUTHSCRM-1
 
-$ git push origin feature/CFSAUTHSCRM-43
- git commit -m 'CFSAUTHSCRM-43 Update the service to use password and tls to connect redis'
 
 
 
