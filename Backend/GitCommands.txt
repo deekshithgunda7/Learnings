@@ -4,7 +4,7 @@ GIT Commands
 cd existing_folder 
 git init 
 git status
-git remote add origin ssh://git@oxfordssh.awsdev.infor.com:7999/IONAPI/poc/cfs_node_aws_lambda.git
+git remote add origin ssh://git@poc/node_aws_lambda.git
 git add .
 git commit -m "Initial commit"
 git push origin branch name
@@ -13,7 +13,7 @@ git push -u origin master
      (OR)
 git push origin branch name
 git push -u “url” master
-git clone ssh://git@oxfordssh.awsdev.infor.com:7999/IONAPI/poc/cfs_node_aws_lambda.git 
+git clone ssh://IONAPI/poc/node_aws_lambda.git 
 git push origin branch name
 
 -----------------------------------------------------------------------------------
