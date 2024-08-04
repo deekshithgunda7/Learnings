@@ -23,12 +23,7 @@ http://localhost:3000/users/1  --put by id
 http://localhost:3000/users/1  --delete by id
 -------------------------------------------
 
-cfs-serverless-poc
-  user: 'cfsadmin',
-  host: 'cfs-ds-svc-v2.cluster-cq28mf64bhy8.us-east-1.rds.amazonaws.com',
-  database: 'Cfs_DiscoverySvc_V2',
-  password: 'Password1!',
-  port: 5432
+
 
 
 
@@ -65,13 +60,6 @@ ALTER COLUMN awsaccount_id TYPE BIGINT;-----------------------------------------
 
 
 
-
-TODO:
-*explore more on sam
-*Understand tables and quries related to mock apis in springboot
-*create tables on psql
-*understand how to use lambda function and sam local
-*should learn more ExpressJs concepts
 
 sam init --no-interactive --runtime nodejs12.x --dependency-manager npm --output-dir . --name simple-node-api  --app-template hello-world
 ---------------------------------------------------------------------------------------------------------------------------------------------------
