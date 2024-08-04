@@ -1,0 +1,486 @@
+New methods Included in java8:
+1)  default method in interfaces
+2)  static method in interfaces
+
+Till Java 7, interface methods are by default public abstract.i.e no method defination is allowed.
+Default method in interfaces:  
+============================
+->A default method is a method defined within an interface with the default keyword in which a method body is provided.
+->A default method within an interface defines an abstract method with a default implementation. In this manner, classes have the option to override the default method 
+  if they need to, but they are not required to do so. If the class doesn’t override the method, the default implementation will be used.
+->Advantage with dafault method:
+	1) If we need to change already existing interface by adding a new method, then all classes implementing this interface needs to override that method.
+		which is practiclly so difficult.So providing default implementation for new methods allows no change to classes implementing that interface.	
+
+Example:
+
+interface interface1
+{
+	void method1(String str);
+	default Object getName()     //here default is not access specifier, its a keyword to indicate that this method has default implementation.
+	{
+		return "Shiva";
+	}
+}
+interface interface2
+{
+	void method1(String s);
+	void method2(int a);
+}
+class InterfaceImplementationClass implements interface1, interface2
+{
+	public void method1(String s)
+	{
+		System.out.println("method 1");
+	}
+	public void method2(int a)
+	{
+		System.out.println("method 2");
+	}
+}
+public class DefaultMethodsInInterface {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		InterfaceImplementationClass ref = new InterfaceImplementationClass();
+		ref.method1("shiva");
+		ref.method2(10);
+		System.out.println(ref.getName());//Shiva
+		
+	}
+}
+
+Suppose interface2 is as follow
+interface interface2
+{
+	void method1(String s);
+	void method2(int a);
+	default Object getName()        
+	{
+		return this.toString();
+	}
+}
+In this case, InterfaceImplementationClass  must provide its own defination for getName() method otherwise its a compile time error. Because, we face ambiguity when 
+  ref.getName() call is made, as which defination needs to be invoked. So,
+  
+class InterfaceImplementationClass implements interface1, interface2
+{
+	public void method1(String s)
+	{
+		System.out.println("method 1");
+	}
+	public void method2(int a)
+	{
+		System.out.println("method 2");
+	}
+	public  String getName()
+	{
+		return "interfaceimplclass";
+	}
+} 
+ ref.getName()  call will return "interfaceimplclass" as o/p.
+ 
+static method in interfaces:
+===========================
+public interface Hop 
+{
+	static int getJumpHeight() 		//its public by default  as interface methods are by default public.
+	{
+	return 8;
+	}
+}	
+ 
+public class Bunny implements Hop {
+	public void printDetails() 
+	{
+		System.out.println(Hop.getJumpHeight());
+	}
+}
+->Distinction between a static method in a class and an interface is a static method defined in an interface is not inherited in any classes that implement the interface.
+			  
+-> We can call the static method defined in interface using interface name. As static methods in interfaces cannot be overridden in implementing classes.
+-> The advantage with static methods in interfaces is, simply updating interface is sufficient without modifying any implementing class.  
+=======================================================
+Functional Interfaces and Lambda Expressions:
+---------------------------------------------
+
+->A functional interface is an interface that contains exactly one abstract method. It may contain zero or more default methods and/or static methods. 
+->We don’t need to use @FunctionalInterface annotation to mark an interface as Functional Interface. 
+  @FunctionalInterface annotation is a facility to avoid accidental addition of abstract methods into the functional interfaces. 
+
+->java.lang.Runnable interface is a great example of functional interface as Runnable interface has single abstract method i.e run()
+  Runnable runnable = new Runnable(){
+    @override
+	public void run()
+	{
+	     System.out.println("runnable");
+	}
+   }
+   
+->One of the major benefits of functional interface is the possibility to use lambda expressions to instantiate them. 
+->As functional interface contains exactly one abstract method, you can omit the name of that method when you implement it using a lambda expression.		
+  Above Runnable lines of code as below using lambda expression
+  
+  Runnable runnable = () -> {System.out.println("runnable")};                 //() indicates  - arguments if any 
+				OR
+  Runnable runnable = () -> System.out.println("runnable");                    //   () indicates  - arguments if any 
+  Thread t = new Thread(runnable);
+  t.start();
+Example:
+public interface Interface1 {
+
+	void method1(String str);
+}
+
+Interface1 i1 = (s) -> System.out.println(s);
+		
+i1.method1("abc");
+
+
+Usefull when functional interface has only one line of code. lambda expression is lighter when compared the statemts bound to funtion.
+
+Date and Time:
+--------------
+Java 8 introduces a new package java.time to deal with dates. The old classes such as java.util.Date are not recommended anymore.
+
+Briefly:
+java.time Package: This is the base package of new Java Date Time API. All the commonly used classes such as LocalDate, LocalTime, LocalDateTime, Instant, Period, Duration are part of this package. 
+All of these classes are immutable and thread safe. 
+
+java.time.format Package: This package contains classes used for formatting and parsing date time objects such as java.time.format.DateTimeFormatter.
+
+(The following two are not important for the exam.)
+
+java.time.zone Package: This package contains classes for supporting different time zones and their rules.
+
+java.time.chrono Package: This package defines generic APIs for non ISO calendar systems. We can extend AbstractChronology class to create our own calendar system.
+java.time.temporal Package: This package contains temporal objects and we can use it for find out specific date or time related to date/time object. For example, we can use these to find out the first or last day of the month. You can identify these methods easily because they always have format “withXXX”.
+-------------------------
+
+
+forEach:  forEach() method in Iterable interface
+--------
+
+->Whenever we need to traverse through a Collection, we need to create an Iterator whose whole purpose is to iterate over and then we have business logic in a loop for each of the elements in the Collection. 
+  We might get ConcurrentModificationException if iterator is not used properly.
+  
+Example:
+
+import java.util.List;
+import java.util.function.Consumer; //observe this
+import java.util.ArrayList;
+import java.util.Iterator;
+
+public class Java8ForEachExample {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		List<Integer> arrayList = new ArrayList<Integer>();
+		arrayList.add(1);
+		arrayList.add(2);
+		arrayList.add(3);
+		arrayList.add(4);
+		arrayList.add(1);
+		Iterator<Integer> itr = arrayList.iterator();
+		while(itr.hasNext())
+		{
+			System.out.println("elements of list" +itr.next());
+		}
+		System.out.println("==========");
+		MyConsumer action = new MyConsumer();
+		arrayList.forEach(action);                //here forEach(..)  method defination is present in Iterable interface. Notice that Iterable is an interface having defination for a method
+												  //i.e forEach(..) is declared as default.
+		System.out.println("--------------");
+		arrayList.forEach(new MyConsumer() {        //anonymous way of traversing using formEach
+			public void accept(Integer a)
+			{
+				System.out.println("print "+a);
+			}
+		});
+	}
+
+}
+class MyConsumer implements Consumer<Integer>
+{
+
+	@Override
+	public void accept(Integer a)
+	{
+		System.out.println("elements "+a);
+	}
+	
+}
+==================================
+
+Optional:  It is a public final class and used to deal with NullPointerException in Java application. java.util.Optional;
+--------
+When we are dealing with refereces which normally holds objects, sometimes these refereces may be null. In these case we face NullPointerExceptions.
+To avoid NullPointerExceptions we use Optional which checks if referece is null or not.
+
+
+import java.util.Optional;  
+public class OptionalExample {  
+    public static void main(String[] args) {  
+        String[] str = new String[10];  
+        Optional<String> checkNull = Optional.ofNullable(str[5]);    //here str array is just declared but not initialized with values.so str[5] will have null.
+        if(checkNull.isPresent()){  // check for value is present or not  
+            String lowercaseString = str[5].toLowerCase();     //will throw NullPointerException if checkNull.isPresent() check is not present.
+            System.out.print(lowercaseString);  
+        }else  
+            System.out.println("string value is not present");  
+    }  
+} 
+
+===========
+Streams:
+
+Java 8 Streams : Process objects from collection. 
+ Advantage : concise code. We can use lamda expressions 
+
+ArrayList<Integer> al = new ArrayList<Integer>();
+
+stream():
+       Stream s = c.stream()  //Stream is interface , c is Collection
+   al.stream();
+     
+parallelStream() :
+
+filter(predicate) :    input : 10 elements, output: <=10 elements
+      
+To filter even numbers from arraylist al, 
+   ArrayList filteredlist  =   al.stream().filter(i->i%2==0).collect(Collectors.toList());
+   Set  evenset  = al.stream().filter(i->i%2==0).collect(Collectors.toSet());
+   
+   
+map(function) :  input : 10 elements, output: 10 elements
+
+     To add 5 to all the elements of arraylist
+      ArrayList list  =   al.stream().map(i->i+5).collect(Collectors.toList());
+    
+reduce() :
+
+sorted()  :
+     ArrayList list  =   al.stream().sorted().collect(Collectors.toList());
+  
+  ->Descending order:
+          al.stream().sorted((i1<i2) ? 1 : ((i1>i2) ? -1 : 0)).collect().Collectors.toList();
+ 
+forEach()  :   To perform some functionality on each element of collection
+
+          ArrayList list  =   al.stream().forEach(function);
+      ArrayList list  =   al.stream().forEach(System.out::println());    //observe :: scope resolution operator
+  
+  -> we can use stream for funtional interfaces.
+ java.util.function.Consumer;  
+  
+Consumer<Integer> c = i-> {System.out.println("square is : "+i*i)};
+al.stream().forEach(c);
+     
+count()  :
+       ArrayList list  =   al.stream().filter(i->i<25).count();
+   
+   
+toArary() :  To convert stream of elements to arraylist
+ 
+    Integer[] i = al.stream().toArray(Integer[]:: new );  //creating array of Integer objects using new operator.
+
+Stream.of() : TO get stream for array elements
+
+   Integer[] i = new Integer(....);
+   Stream s = Stream.of(i);
+ 
+al.stream().min( (i1,i2)-> i1.compareTo(i2)).get();
+al.stream().max((i1,i2)-> i1.compareTo(i2)).get();
+
+
+---------------------------
+
+import java.util.Arrays;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+public class Java8Tester {
+
+   public static void main(String args[]) {
+      System.out.println("Using Java 7: ");
+		
+      // Count empty strings
+      List<String> strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");
+      System.out.println("List: " +strings);
+      long count = getCountEmptyStringUsingJava7(strings);
+		
+      System.out.println("Empty Strings: " + count);
+      count = getCountLength3UsingJava7(strings);
+		
+      System.out.println("Strings of length 3: " + count);
+		
+      //Eliminate empty string
+      List<String> filtered = deleteEmptyStringsUsingJava7(strings);
+      System.out.println("Filtered List: " + filtered);
+		
+      //Eliminate empty string and join using comma.
+      String mergedString = getMergedStringUsingJava7(strings,", ");
+      System.out.println("Merged String: " + mergedString);
+      List<Integer> numbers = Arrays.asList(3, 2, 2, 3, 7, 3, 5);
+		
+      //get list of square of distinct numbers
+      List<Integer> squaresList = getSquares(numbers);
+      System.out.println("Squares List: " + squaresList);
+      List<Integer> integers = Arrays.asList(1,2,13,4,15,6,17,8,19);
+		
+      System.out.println("List: " +integers);
+      System.out.println("Highest number in List : " + getMax(integers));
+      System.out.println("Lowest number in List : " + getMin(integers));
+      System.out.println("Sum of all numbers : " + getSum(integers));
+      System.out.println("Average of all numbers : " + getAverage(integers));
+      System.out.println("Random Numbers: ");
+		
+      //print ten random numbers
+      Random random = new Random();
+		
+      for(int i = 0; i < 10; i++) {
+         System.out.println(random.nextInt());
+      }
+		
+      System.out.println("Using Java 8: ");
+      System.out.println("List: " +strings);
+		
+      count = strings.stream().filter(string->string.isEmpty()).count();
+      System.out.println("Empty Strings: " + count);
+		
+      count = strings.stream().filter(string -> string.length() == 3).count();
+      System.out.println("Strings of length 3: " + count);
+		
+      filtered = strings.stream().filter(string ->!string.isEmpty()).collect(Collectors.toList());
+      System.out.println("Filtered List: " + filtered);
+		
+      mergedString = strings.stream().filter(string ->!string.isEmpty()).collect(Collectors.joining(", "));
+      System.out.println("Merged String: " + mergedString);
+		
+      squaresList = numbers.stream().map( i ->i*i).distinct().collect(Collectors.toList());
+      System.out.println("Squares List: " + squaresList);
+      System.out.println("List: " +integers);
+		
+      IntSummaryStatistics stats = integers.stream().mapToInt((x) ->x).summaryStatistics();
+		
+      System.out.println("Highest number in List : " + stats.getMax());
+      System.out.println("Lowest number in List : " + stats.getMin());
+      System.out.println("Sum of all numbers : " + stats.getSum());
+      System.out.println("Average of all numbers : " + stats.getAverage());
+      System.out.println("Random Numbers: ");
+		
+      random.ints().limit(10).sorted().forEach(System.out::println);
+		
+      //parallel processing
+      count = strings.parallelStream().filter(string -> string.isEmpty()).count();
+      System.out.println("Empty Strings: " + count);
+   }
+	
+   private static int getCountEmptyStringUsingJava7(List<String> strings) {
+      int count = 0;
+
+      for(String string: strings) {
+		
+         if(string.isEmpty()) {
+            count++;
+         }
+      }
+      return count;
+   }
+	
+   private static int getCountLength3UsingJava7(List<String> strings) {
+      int count = 0;
+		
+      for(String string: strings) {
+		
+         if(string.length() == 3) {
+            count++;
+         }
+      }
+      return count;
+   }
+	
+   private static List<String> deleteEmptyStringsUsingJava7(List<String> strings) {
+      List<String> filteredList = new ArrayList<String>();
+		
+      for(String string: strings) {
+		
+         if(!string.isEmpty()) {
+             filteredList.add(string);
+         }
+      }
+      return filteredList;
+   }
+	
+   private static String getMergedStringUsingJava7(List<String> strings, String separator) {
+      StringBuilder stringBuilder = new StringBuilder();
+		
+      for(String string: strings) {
+		
+         if(!string.isEmpty()) {
+            stringBuilder.append(string);
+            stringBuilder.append(separator);
+         }
+      }
+      String mergedString = stringBuilder.toString();
+      return mergedString.substring(0, mergedString.length()-2);
+   }
+	
+   private static List<Integer> getSquares(List<Integer> numbers) {
+      List<Integer> squaresList = new ArrayList<Integer>();
+		
+      for(Integer number: numbers) {
+         Integer square = new Integer(number.intValue() * number.intValue());
+			
+         if(!squaresList.contains(square)) {
+            squaresList.add(square);
+         }
+      }
+      return squaresList;
+   }
+	
+   private static int getMax(List<Integer> numbers) {
+      int max = numbers.get(0);
+		
+      for(int i = 1;i < numbers.size();i++) {
+		
+         Integer number = numbers.get(i);
+			
+         if(number.intValue() > max) {
+            max = number.intValue();
+         }
+      }
+      return max;
+   }
+	
+   private static int getMin(List<Integer> numbers) {
+      int min = numbers.get(0);
+		
+      for(int i= 1;i < numbers.size();i++) {
+         Integer number = numbers.get(i);
+		
+         if(number.intValue() < min) {
+            min = number.intValue();
+         }
+      }
+      return min;
+   }
+	
+   private static int getSum(List numbers) {
+      int sum = (int)(numbers.get(0));
+		
+      for(int i = 1;i < numbers.size();i++) {
+         sum += (int)numbers.get(i);
+      }
+      return sum;
+   }
+	
+   private static int getAverage(List<Integer> numbers) {
+      return getSum(numbers) / numbers.size();
+   }
+}
+------------------------------------

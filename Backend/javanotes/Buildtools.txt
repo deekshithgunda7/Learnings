@@ -1,0 +1,286 @@
+pom.xml   - when you need 3rd party jars, dependancy jars, we specify those in pom.xml. Only one pom.xml for entire project
+
+maven is a build tool to build a java project. mvn repository is a central repository from which all the required 3rd party jars are downloaded.
+
+All the downloaded jars are maintained in a local repository, so that always no need to download. Also easy to get updated jars.
+
+maven life cycle mainly contains , clean , compile, package.
+
+<project>
+ <modelversion> versionnumber </modelversion>
+ <dependencies>
+  <dependancy>
+    <Groupid>org.springframework</Groupid>
+    <artifactid>spring-context</artifactid>
+    <version>4.2.4-RELESE</version>
+  </dependancy>
+ </dependencies> 
+ 
+ <build>
+    <sourcedirectory>.......</sourcedirectory>
+	<testdirectory>..........</testdirectory>
+	<scriptdirectory>............</scriptdirectory>
+	<outputdirectory>........,</outputdirectory>
+	
+ </build>
+ 
+ <pluginmanagement>
+   <plugins>
+     <plugin>
+	    <artifactid>...</artifactid>
+		<version>....</version>
+	 <plugin>
+	 .....
+    </plugins>
+  </pluginmanagement>	
+  
+</project>
+
+
+-----------------------------------------------------------
+Junit :  Test unit of code. A unit can be a method or a set of methods.
+We need Junit external jar to write Junit test cases.
+External dependencies should be removed from unit tests, e.g., by replacing the dependency with a test implementation or a (mock) object created by a test framework.
+
+for example src/test/packagename/filenameTest.java   a Junit test case file. @Test is the annotation used to represent method as test case. 
+
+@Test
+public void methodnameTestcase(){..}  - example method (prototype should not be changed.i.e must be public, void)
+  which has code for testing a certain logic(or simply test case code).
+
+  assertEquals(expectedoutput , businesslogicmethodcallwhichreturnsresult())   -  one of the test case (assertions) used in Junit.
+  assertFalse(businesslogicmethodcallwhichreturnsresult())  - test results success if value returned is false, else testcase failed.
+  assertTrue(businesslogicmethodcallwhichreturnsresult())
+  assertArrayEquals(expectedoutput , businesslogicmethodcallwhichreturnsresult())  - to test functionalities related to arrays
+  
+@Before
+public void methodexecutesbeforeTestmethod()
+{
+}  
+@After
+public void methodexecutesafterTestmethod()
+{
+}  
+@BeforeClass
+public static void methodexecutesatclassloadingtime()  //must be static  //executes only once
+{
+}
+@AfterClass
+public static void methodexecutesatend()  //must be static  //executes only once
+{
+}
+
+-> To execute test methods,
+
+public class MyTestRunner {
+  public static void main(String[] args) {
+    Result result = JUnitCore.runClasses(MyClassTest.class);  //MyClassTest has different set of test methods
+    for (Failure failure : result.getFailures()) {
+      System.out.println(failure.toString());
+    }
+
+JUnit assumes that all test methods can be executed in an arbitrary order. Well-written test code should not assume any order, i.e., tests should not depend on other tests.
+  }
+}
+
+As of JUnit 4.11 the default is to use a deterministic, but not predictable, order for the execution of the tests.
+
+You can use an annotation to define that the test methods are sorted by method name, in lexicographic order. 
+ To activate this feature, annotate your test class with the @FixMethodOrder(MethodSorters.NAME_ASCENDING) annotation. 
+ You can also explicitely set the default by using the MethodSorters.DEFAULT parameter in this annotation. 
+ You can also use MethodSorters.JVM which uses the JVM defaults, which may vary from run to run.
+
+@Ignore or @Ignore("Why disabled")  - 
+public void methodexecutesbeforeTestmethod()
+{
+} 
+ Marks that the test should be disabled. This is useful when the underlying code has been changed and the test case has not yet been adapted. 
+ Or if the execution time of this test is too long to be included. It is best practice to provide the optional description, why the test is disabled.
+
+@Test(timeout=100)  
+public void methodexecutesbeforeTestmethod()
+{
+     //used for performance testing.
+} 
+   Fails if the method takes longer than 100 milliseconds.
+
+@Test (expected = NullPointerException.class)
+ public void methodexecutesbeforeTestmethod()
+{
+} 
+     Fails if the method does not throw the named exception.
+
+assertNull([message,] object) - Checks that the object is null.
+
+assertNotNull([message,] object) - Checks that the object is not null.
+
+-> In a test method, if we want to read configuration files
+    InputStream is = getClass().getResourceAsStream( "/test.properties" );
+
+-------
+Parameterized testcases:
+  If we want to write a single test method to test a functionality with different input values. We can do so using parameterized test cases.
+
+//Here consider a scenario where the functionality to be tested is like, we pass an inputstring, method should return a string by truncating all "A" character present at the begining.
+
+@RunWith(Parameterized.class)
+public class TestClass
+{
+  private String input;
+  private String output;
+  public TestClass(String input, String output)
+  {
+   this.input = input;
+   this.output = output;
+  }
+  @Parameters
+  public static Collection<String[]> testConditions()
+  {
+    String expectedoutput[][] =  {
+        {"AACD", "CD"},
+        {"ACD", "CD"}
+     }
+   return Arrays.asList(expectedoutput);
+  } 
+  @Test
+  public void testTruncateFunctionality()
+  {
+    assertEquals(expectedoutput, businesslogicmethodcallwhichreturnsresult(input));
+  }
+}
+-----
+TestSuite -  We can create a suite by grouping all necessaring TestClases.
+
+---------------------------------------------------
+
+Jenkins - purpose of jenkins is continuous integration.
+ Developers commit the code. pulls the latest code, code is built using any of build tools such as ant, maven,.. . if there is any failure in the build the same will be notified.
+ Build will be tested and if there are any test case failures, the same will be notified.
+ 
+Jenkins have various plugins such as maven(for building),Junit (for unitesting),mailnotification plugin,....
+The process for adding multiple Jenkins server, on jenkins page click add another jenkins instance, ......
+----------------------
+Maven:
+ Maven : 
+   Maven is essentially a project management and comprehension tool and as such provides a way to help with managing:
+
+Builds
+Documentation
+Reporting
+Dependencies
+SCMs
+Releases
+Distribution
+
+The Maven project structure looks like
+   src/main/java/*.java
+   src/main/resources/..
+   src/test/java/
+   src/test/resources
+   
+
+mvn clean     -  remove the target directory
+mvn compile   -  compiles source code
+mvn test-compile  -  compiles test cases
+mvn package  -  suppose to build as jar  <packaging>jar</packaging>
+mvn install   -  install generated packages into local repositories ((${user.home}/.m2/repository)
+
+<dependencies>
+  <dependancy>
+    <groupid>
+    <artifact-id>
+    <version>
+    <scope>compile/runtime/test</scope>
+</dependancy>
+</dependencies>
+<build>
+ <resource>configuration files</resource>
+
+To build different projects,
+  -> each project will have its own pom.xml
+  -> we have to create a new pom.xml  (we consider it as parent pom.xml) 
+         <modules>
+               <module>my-app</module>
+    		<module>my-webapp</module>
+  	</modules>
+  -> in each project pom.xml add
+           <parent>
+               <groupId>com.mycompany.app</groupId>
+              <artifactId>app</artifactId>
+              <version>1.0-SNAPSHOT</version>
+           </parent>
+
+=======================
+GIT : 
+  GIT is a distributed version control system and source code management (SCM) system 
+difference between GIT and SVN:
+  Git is a distributed VCS; SVN is a non-distributed VCS. Git has a centralized server and repository; 
+  SVN does not have a centralized server or repository. The content in Git is stored as metadata; SVN stores files of content.
+
+working directory -> staging area -> local repository - > Central repository
+
+git config  - configuration. git associates with username and email
+git init [repository name] - create new repository
+git clone [url]  - clone the code
+git add filename
+git commit -m "commit message"
+git commit -amend
+git diff  - shows the differences in original and modified content in files
+git reset filename  - added files will be moved back to modified state (unstaged state)         
+git reset commit              (git reset HEAD~1)
+git revert commit -  if commit pushed , then use this to revert
+git rm filename  - removes the file from working directory
+git branch branchname  - create a branch
+git branch -d branchname  - deletes the branch
+git checkout filename  -  rollback the changes
+git checkout branchname - to switch to other branch
+git push originbranch
+git fetch
+git pull  - This command fetches and merges changes on the remote server to your working directory.
+git status
+git stash   - save the modified files
+git stash apply
+git stash drop
+git rebase -i originbranch               
+git cherry-pick <commit-hash>\
+
+Git pull = git fetch + git merge
+git rebase and git merge both are same, but the tree structure vary.
+===========================================================
+linux commands - grep , find , sed , awk
+
+sed '-s/oldstring/newstring/'  filename   -  replaces 1st occurance of oldstring on each line with newstring
+sed '-s/oldstring/newstring/g'  filename  - replaces all occurances of oldstring with newstring
+
+sed '-s/oldstring/newstring/2'  filename  - replaces 2nd occurance of oldstring
+
+sed '3 -s/oldstring/newstring/'  filename  - replaces oldstring present in line number 3
+
+sed '-s/oldstring/newstring/p'  filename  - prints modified lines twice and unmdified lines once on console
+
+sed -n 's/oldstring/newstring/p'  filename  - prints modified lines 
+
+sed 'nd' filename  - delete nth line from file
+
+sed '$d' filename  - delete lastline from file
+
+sed '3,6d' filename  - deletes lines 3,4,5,6 from file
+-------------------------------------------
+awk '{print}' file 
+
+==============================
+Web server -  Provides an environment to run web applications. Technologies used are HTML,CSS,Javascript,Servlets,Jsp
+  example - Apache web server.
+Application server - 
+      To build an enterprise application we use J2EE technologies such as EJB,JMS,JDBC,...
+	  Application server is the one which provide environment for running this applications.
+	  Application server has in-built web server.
+	  Requires Java installed. 
+ example - Apache tomcat.
+ /opt/apache-tocat-v.. -  path of application server
+ To start application server(apache-tomcat) , /opt/apache-tocat-v../bin/startup.sh
+ To check the status of application server i.e if it is running or not, open browser -> http://localhost:8080 -    (instead of localhost, give the server ip where apache tomcat is installed) 
+         8080 - default port for apache tomcat server.           (server.xml file containing port,connection information)
+		 80 - default port for apache web server.
+  create users: 
+       tomcat-users.xml  -  <user username=" " passwd=" " role=" "/>               role cane be - manager-gui, admin-gui

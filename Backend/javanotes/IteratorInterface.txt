@@ -1,0 +1,66 @@
+1. Iterator and Enumeration both are interfaces available in util package
+2. Enumeration is old , Iterator is new
+3. Iterator interface has below methods		Enumeration interface has below methods
+        hasNext()								hasMoreElements()
+        next()									nextElement()
+        remove()								---------
+so, Enumeration has no remove() method.
+    Iterator<Integer> itr = arraylist.iterator();
+    while(itr.hasNext())
+    {	//itr.remove();  //Exception, as .next() is not yet called . donot know which element to remove
+           System.out.println(itr.next());
+           itr.remove();  //removes the last fetched element( i.e .element returned by .next()) will be removed from arraylist
+    }
+    after this arraylist size is 0
+4.Enumeration and Iterator are interfaces , so hasNext(),next(),....  method implementations are available in which class?
+   In case of Iterator,
+	   Iterator itr = arraylistobj.iterator()    -- > suppose arraylistobj is of ArrayList class.
+       ArrayList class has a private class Itr, whose object is return on call to arraylistobj.iterator() method.
+   In case of Enumeration,
+		List<Integer> v = new Vector<Integer>();
+		Enumeration e = ((Hashtable<Integer, String>) v).elements();
+		Vector v1 = new Vector<Integer>();
+        Enumeration enum = vectorobj.elements()    -- >  enumeration can be used to iterate only specific collection interfaces Vector,Hashtable
+				 (observe above type casting)
+				 
+5. Enumeration is fail-safe.i.e ConcurrentModificationException is not thrown even Collection is modified structurally during traversal.
+    for example,
+     	one thread is traversing over a Collection while other thread is trying to modify the Collection (add/remove/..)
+6. Iterator is fail-fast.i.e ConcurrentModificationException is  thrown if Collection is modified structurally during traversal.
+     for example, 
+        a) one thread is traversing over a Collection while other thread is trying to modify the Collection (add/remove/..)
+        b) After the creation of the iterator , structure is modified at any time by any method other than iterator's own remove method. 
+     Here point to remember is within same thread, iterators own remove() method can do modifications to Collection while traversing.
+7. Iterator can be  Fail-Fast & Fail-Safe
+     a) Fail-Fast Iterator:
+           arraylist.add(2);arraylist.add(5);
+           arraylist.add(1);arraylist.add(4);
+           Iterator<Integer> itr = arraylist.iterator();
+	       while(itr.hasNext())
+	       {	 
+			System.out.println(itr.next());  //ConcurrentModificationException 
+			arraylist.add(10);
+		   }
+           o/p: 2
+                Exception
+
+      b)  Fail-Safe Iterator:  
+               ConcurrentHashMap<String,String> Phone = 
+                               new ConcurrentHashMap<String,String>(); 
+        Phone.put("Apple", "iPhone");
+        Phone.put("HTC", "HTC one");
+        Phone.put("Samsung","S5");
+        
+        Iterator iterator = Phone.keySet().iterator();
+        
+        while (iterator.hasNext())
+        {
+            System.out.println(premiumPhone.get(iterator.next()));
+            premiumPhone.put("Sony", "Xperia Z");
+        }          
+          o/p:  Samsung
+				HTC 
+				Apple             
+NOTE: a) In the fail-safe case we are using ConcurrentHashMap  which is synchronized, where in fail-fast case , arraylist is used which is not synchronized. So it all depends on the iterator object returned by the corresponding Collection class.
+      b) Fail-safe iterator copies the original Collection into temporary  Collection and traverse over temporary Collection instead of original Collection.so not gauranteed that structural changes during traverse will not be reflected
+		

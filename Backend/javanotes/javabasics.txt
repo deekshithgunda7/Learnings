@@ -1,0 +1,823 @@
+﻿ Java:
+----
+->When we compile .java file, compiler generates .class file for each class defined in .java file.	
+	
+->jar file - java archive. set of .class files
+->war file - web archive. complete web application is built as war file.(XML,JSP,HTML,SERVLETS,..)
+->ear file - enterprise application is built into ear file.
+
+->java command to execute a .class file, where syso statements are outputed to console.
+->javaw command will not output syso statements to console. To run GUI based application we use javaw command.
+->javaws  launch jnlp file,run the application.
+
+Create a jar file:
+      jar -cvf *.class
+Extract jar
+       jar -xvf file.jar
+Display table of contents of jar
+        jar -tvf file.jar
+		
+javap - The javap command disassembles a class file. The javap command displays information about the fields,constructors and methods present in a class file. 
+
+ javap java.lang.Object  
+
+ javap -c java.lang.Object  - to see disassembled code. The code that reflects the java bytecode.  
+============================================================================================================================================================	
+OOPS Concepts:
+  -  Class , Object
+  -  Inheritance			-   Code reusability
+  -  Polymorphism			-   method overloading , overriding
+  -  Abstraction			-   interface , abstract class
+  -  Encapsulation			-   Class
+
+============================================================================================================================================================
+
+->Access Modifiers for class data members:
+private -> within class (private data memebers of a class can be accessed only by methods of its class).
+default	-> within same package. If no access specifier is specified explicitly then its default.
+protected  -> Visible to the package and all subclasses of other package.
+		NOTE:here In subclass you can access superclass protected members only through subclass reference variable.
+public -> visible any where.
+
+If a class is specified as private, then it can't be accessed outside.
+nested classes can be private.
+=============================================================================================================================================
+
+varArg:
+->A vararg parameter must be the last element in a method parameter list. This implies you are only allowed to have one vararg parameter per method.
+->When calling a method with a vararg parameter, you have a choice. You can pass in an array, or you can list the elements as array and let Java create it for you. 
+  You can even omit the vararg values in the method call and Java will create an array of length zero for you.		
+  void mehod(String... varlenarg);
+========================================================================================================================	
+  
+order of initialization:
+-----------------------
+1.Static variable declarations and static initializers in the order they appear in the file.
+2.Instance variable declarations and instance initializers(block) in the order they appear in the file,
+		Only if there is object creation, because only then instance variables will be initialized & memory is allocated.
+3.The constructor. when a constructor is invoked i.e new Classname(); then instance initializer blocks will be invoked before 
+							execution of constructor code, Otherwise instance initialization blocks will never be executed.
+
+public class InitializationOrderSimple 
+{
+  private String name = "Torchie";
+ { 
+	System.out.println(name); 
+ }
+ private static int COUNT = 0;
+ static 
+ { System.out.println(COUNT); 
+ }
+ static 
+ { COUNT += 10; System.out.println(COUNT); 
+ }
+ public InitializationOrderSimple() 
+ {
+ System.out.println("constructor");
+ }
+}
+	public class CallInitializationOrderSimple {
+          public static void main(String[] args) {
+           InitializationOrderSimple init = new InitializationOrderSimple();
+ } }
+ 
+  o/p:
+   0
+   10
+   Torchie
+   constructor
+   
+ 
+ public class InitializationOrder 
+ {
+	 private String name = "Torchie";
+	 { 
+	  System.out.println(name); 
+	 }
+	 private static int COUNT = 0;
+	 static 
+	 {
+    	 System.out.println(COUNT); 
+ 	 }
+	 {
+	 COUNT++; System.out.println(COUNT); 
+	 }
+	 public InitializationOrder() 
+	 {
+	    System.out.println("constructor");
+	 }
+	 public static void main(String[] args) 
+	 {
+	 System.out.println("read to construct");
+	 new InitializationOrder();
+	 }
+ }
+The output looks like this:
+0
+read to construct
+Torchie
+1
+constructor
+
+=============================================================================================================================================
+Polymorphism:
+method overloading
+method overriding
+
+overloading methods:	main() method can be overloaded.      
+===================
+->Everything other than the method signature can vary for overloaded methods, there must be a difference in parameters(no.of paramets, type of parameters or order of parameters).
+	This means there can be different access modifiers, specifiers (like static), return types, and exception lists.
+->valid overloading:	
+
+ public void fly(int numMiles) { }
+	
+	public void fly(short numFeet) { }
+	public boolean fly() { }
+	void fly(int numMiles, short numFeet) { }
+	public void fly(short numFeet, int numMiles) throws Exception { }
+	public void fly(Integer numMiles) { }			//fly(3); autoboxing is done.
+	
+->Since we are not allowed to overload methods with the same parameter list,
+
+	public void fly(int numMiles) { }   
+	  public int fly(int numMiles) { } // DOES NOT COMPILE
+	
+	
+	public void fly(int[] lengths) { }
+	 public void fly(int... lengths) { } // DOES NOT COMPILE
+	
+-> If  two methods having the same name and parameters but difference in return type, then program will throw compile time error.
+   Return type is not a part of the method signature. Hence, we can not achieve method overloading by changing the return type of the methods.
+		
+->In case of method overloading, type promotion is done by compiler(implicit type casting or auto boxing(premitive to Wrapper).(but no type depromotion)
+
+     byte->short->int->long->float->double		upto 2 conversion ok.
+	 add(10,10);// int , int 
+	 void add(float a , float b){}
+	 void add(double a, int b) {}            
+	
+	//compiler error, compiler is not able to identify which method to execute as both of them are applicable after type promotion. 
+	 
+->In case of type depromotion, you need to do type casting explicitly.
+===============================================================================================================================
+INHERITANCE: 
+============
+Inheritance is the process by which the new child subclass automatically includes any public or protected members defined in the parent class.
+				(here in the above statement default is not specified, because default members not available for inheritance outside the package)
+
+-> when Java sees you define a class that doesn’t extend any class, it immediately adds the syntax extends java.lang.Object to the class definition.
+-> If you define a new class that extends an existing class, Java doesn’t add this syntax, although the new class still inherits from java.lang.Object.
+
+-> Every class has atleast one constructor. In the case that no constructor is declared, compiler will automatically insert a default no-argument constructor(to initialize class variables to 0 or null values),
+   and a call to super class constructor as super().
+
+  class Super
+  {
+    public Super()
+    {
+     System.out.println("super constructor")   ;
+    }
+  }
+
+  public class Main extends Super
+  {
+    public Main()
+    {
+        System.out.println("sub constructor ");
+    }
+  	Super s = new Super();
+	Main m = new Main();//here superclass constructor will also be invoked
+  }
+ o/p:   super constructor
+        super constructor
+		sub constructor
+
+-> when we create an instance of a subclass , implicitly super class default constructor is invoked if no explicit call is available.
+-> The first statement of every constructor is either a call to another constructor within the same class using this(..), or 
+   a call to a constructor in the direct parent class, using super().
+-> If the parent doesn’t have a no-argument constructor and the child doesn’t define any constructors, the compiler will throw an error because compiler tries to insert a default no-argument constructor into the child class with a call super() in it.
+	(in the above scenario,if parent class have a parameterized constructor, and child calls super(), then its an error
+	
+->No copy constructor in java, but we can copy one object to another using constructor by passing object as parameter to constructor.
+   or obj2=obj1   - correct.
+   eobj1=null; valid
+->So when you do obj++, what actually happens is something like this: 
+	obj = new Integer( obj.intValue()  + 1);  
+->Does constructor return any value? yes. current object.
+->We can perform any operaton within a constructor as like in method.
+
+->You can have a private constructor in a class, but you can't instantiate class using that constructor from outside. Also allowed default,protected,public constructors.
+
+-> You can Use this keyword to access members of the parent class that are accessible from the child class, since a child class inherits parent members.
+   i.e child class contains all inheritable super class members.
+this -> Used when class variables and formal parameters to constructor are having same name.if not used then class variables will be initialized to default(0 or null) value, but not error.
+	    this keyword can be passed as an argument to the method.
+
+class Bird 
+{
+	public void fly() 
+	{
+	System.out.println("Bird is flying");
+	}
+	public void eat(int food) 
+	{
+	System.out.println("Bird is eating "+food+" units of food");
+	}
+}
+public class Eagle extends Bird 
+{
+	public int fly(int height) 
+	{
+	System.out.println("this method is overloaded.");   -correct .bcz super class fly() method is also available in child class. 
+		return height;
+	}
+}
+
+method overriding:
+-------------------
+-> If you are overriding any method, overridden method (i.e. method in subclass) must not be more restrictive.i.e access specifier of overriden method must be of same or higher access.
+-> It is possible to override method by changing the return type if subclass overrides any method whose return type is Non-Primitive( class ,String ..)
+
+covariant type: The covariant return type specifies that the return type may vary in the same direction as the subclass. Applicable only to Non-premitive return types.
+		i.e if super class method return type is Object , then subclass overriden method return type can be String,...  (Any subclass of Object class)
+
+class Super
+{
+    public Super()
+    {
+     System.out.println("super constructor")   ;
+    }
+}
+public class Sub extends Super
+{
+	public String name ="subclass";
+    public Sub()
+    {
+        System.out.println("sub constructor "+name);
+    }
+    void method1()
+    {
+        System.out.println("m1 sub");
+    }
+	public static void main(String[] args) {
+	Super s = new Super();         //super constructor
+	Sub m = new Sub();			  //super constructor      sub constructor subclass
+	m.method1();                   //m1 sub
+	System.out.println("=======================");
+	Super refs;Sub refsub;
+    refs = new Sub();
+	refs.name;                     //compile time error        because at compile time compiler tries to find 'name' field in Super class as 'refs' is of type Super.
+	refs.method1();			      //compile time error        " " " "
+	}
+}
+->In the above example, even though a super class reference variable can hold sub class object, But it can't access subclass data members,
+  in case if name , method1 members(in the above example) are not available in superclass 
+1. Casting an object from a subclass to a superclass doesn’t require an explicit cast.
+2. Casting an object from a superclass to a subclass requires an explicit cast. Here no compilation error but ClassCastException is definitely raised.
+
+class Primate 
+{
+	public boolean hasHair() 
+	{
+		return true;
+	}
+}
+interface HasTail 
+{
+	boolean isTailStriped();
+}
+public class Lemur extends Primate implements HasTail 
+{
+	public boolean isTailStriped() 
+	{
+		return false;
+	}
+	public int age = 10;
+	public static void main(String[] args) 
+	{
+	Lemur lemur = new Lemur();
+	System.out.println(lemur.age);			10			
+	HasTail hasTail = lemur;
+	System.out.println(hasTail.isTailStriped());	//false			
+	System.out.println(hasTail.age); // DOES NOT COMPILE beacause at compile time compiler tries to find age in interface hasTail.
+	Primate primate = lemur;
+	System.out.println(primate.hasHair());			//true			
+	System.out.println(primate.isTailStriped()); // DOES NOT COMPILE beacause at compile time compiler tries to find age in Primate class.
+	}
+}
+		
+hiddenmethod  -> overriding static method in subclass. Also, Private members of superclass are by default hidden in subclass.
+In this case, based on reference type using which the member is called, corresponding memeber defination is executed.
+
+Object to Object inheritance:
+        When we create child class object, super class constructor is invoked.
+          
+Abstract Classes:
+----------------
+->An abstract class may have 0 or more abstract methods as well as concrete methods.
+->While extending an abstract class, subclass must either provide implementation for abstract methods or redeclare the class as abstract.
+->We cannot create objects for abstract classes. because suppose we have an abstract class with 2 concrete methods and one abstract method.
+  if we are allowed to create an object of abstract class then, abstractclassObj.abstractmethod() is meaning less. 
+   As abstractmethod() declared in abstract Class do not have any defination.
+
+
+->Multiple inheritance
+         java does not support multiple inheritance.i.e a class extending more than one class.
+		 Class C extends A , B      
+   Reason: 
+     1.Whenever we create an object for any class using new Classname() , internally constructor invocation is as follow
+	             superclass constructor
+				 subclass constructor
+		  So in case of multiple inheritance chain of constructor invocation is ambiguous.
+     2. A , B has a same method. Ambiguity araises when called from class C
+		
+	   class A											class B
+	   {												{
+	      public void x()									 public void x()			
+		  {													  {
+		  ....... 												.......
+		  }													   }
+	}													}
+                         class C extends A, B
+						 {
+						   //here both x() of and x() of B are available as it is public inheritance
+						}
+						 C cref = new C();
+						 cref.x();  //which will be invoked i.e ambiguity
+						 
+Multiple inheritance is achieved by interfaces as below
+A class that implements two interfaces that contain the same abstract method, provides only one defination .
+interface intf1						interface intf2
+{									{
+ public void x();			 			public void x();
+ }									}
+ class Demo implements intf1,intf2
+ {
+   public void x()
+   {
+   }
+ }
+ If the method name and input parameters are same but the return types are different between the two methods, the class attempting to implement
+ both that interfaces will not compile.It is not possible in Java to define two methods in a class with the same name and input parameters but different return types.
+
+Example prgm:   //what is the error in below prgm?
+
+interface interface1
+{
+	void method1(String str);
+}
+interface interface2
+{
+	void method2(int a);
+}
+class InterfaceImplementationClass implements interface1, interface2
+{
+	void method1(String s)  //compilation error.
+	{
+		
+	}
+	void method2(int a)		//compilation error
+	{
+		
+	}
+}  
+  compilation error is, interface methods are by default 'public'. In the implementation class the access specifier of method1 and method2 are 'default', as 
+  we are not supposed to decrease the scope of overridden method (in overriding concept),  method1 and method2 should have 'public' access specifier.
+  
+Polymorphism is achieved using abstract classes.i.e overriding concept comes into picture.
+->We are not allowed to create objects for abstract classes. But when we create object for child class(class extends abstract class), inernally abstract class 
+    constructor is invoked( runtime environment is creating object).
+->Where in case of interfaces, neither developer nor runtime environment can create objects.
+=====================================================================================================
+
+Exception Handling:
+====================
+
+->When an error occurs within a method, the method creates an object and hands it off to the runtime system. The object, called an exception object,
+  contains information about the error including its type and the state of the program when the error occurred. Creating an exception object and handing it to the runtime system is called throwing an exception.
+ 
+->After a method throws an exception, the runtime system attempts to find something to handle it. The set of possible "somethings" to handle the exception is the 
+  ordered list of methods that had been called to get to the method where the error occurred. The list of methods is known as the call stack.
+  
+->The runtime system searches the call stack for a method that contains a block of code that can handle the exception. This block of code is called an exception handler.
+  The search begins within the method in which the error occurred and proceeds through the call stack in the reverse order in which the methods were called. 
+  When an appropriate handler is found, the runtime system passes the exception to the handler. An exception handler is considered appropriate if the type of the exception 
+  object thrown matches the type that can be handled by the handler.
+
+->The exception handler chosen is said to catch the exception. If the runtime system exhaustively searches all the methods on the call stack without finding an 
+  appropriate exception handler,the runtime system (and, consequently, the program) terminates.
+  
+  You associate exception handlers with a try block by providing one or more catch blocks directly after the try block. No code can be between the end of the try block and the beginning of the first catch block.
+		try {
+
+		} catch (ExceptionType e) {
+
+		} catch (ExceptionType e) {
+
+		}
+		//  e Exception object ,    e.printStackTrace()     e.getMessage()   , e 
+		
+		catch (IOException|SQLException ex) {						//observe carefully.  Single catch handling more than one Exception. Allowed from Java SE7.
+				logger.log(ex);
+				throw ex;
+		}
+
+The runtime system always executes the statements within the finally block regardless of what happens within the try block. So it's the perfect place to perform cleanup.
+->  try
+		{
+			return "aa";
+		}
+		finally
+		{
+			return "bbbbb";  //this will be returned.
+		}
+
+
+Runtime Exceptions:(UN CHECKED EXCEPTIONS):		More about logic of your program which cause these.
+===========================================
+
+Runtime exceptions extend RuntimeException class. They don’t have to be handled or declared. They can be thrown by the PROGRAMMER or by the JVM. Common runtime exceptions include the following:
+
+ArithmeticException : Thrown by the JVM when code attempts to divide by zero.
+
+IndexOutOfBoundsException :Thrown by the JVM when code uses an illegal index to access.
+
+ClassCastException :Thrown by the JVM .Ensure that the new type belongs to one of its parent classes,
+
+	i.e subclass object to superclass object [ex: superclassobject = (Superclassname)subclassobject]. but not vice versa.
+	
+	    class Superclass
+		{
+			void example()
+			{
+				System.out.println("in super");
+			}
+		}
+		public  class Subclass extends Superclass
+		{
+	      void example()
+		   {
+		     System.out.println("in sub");
+	       }
+	       public static void main(String[] args) 
+		   {
+	Superclass sp = new Superclass();
+	sp.example();
+	Subclass sb = new Subclass();
+	sb.example();
+	Superclass spref;
+	Subclass sbref;
+	spref =  sb;
+	spref.example();
+	sbref = (Subclass)sp; //ClassCastException					// sbref = sp;	compile time error. Incompatible types
+	sbref.example();
+			}
+		}
+	Observe the difference.
+	
+NullPointerException :Thrown by the JVM when there is a null reference where an object is required.
+	
+IllegalArgumentException :Thrown by the PROGRAMMER to indicate that a method has been passed an illegal or inappropriate argument.
+	Example:   if thread priority is set to value which is outofrange (1,10).
+				
+NumberFormatException : Thrown by the PROGRAMMER when an attempt is made to convert a string to a numeric type but the string doesn’t have an appropriate format.otherwise JVM will throw.
+			Integer.parseInt("abc");
+*** NumberFormatException is a subclass of IllegalArgumentException.			
+
+try{ //some code }
+catch(IllegalArgumentException e){}         //super class
+catch(NumberFormatException e){}     -> unreachable code error.
+
+
+ try {																				
+ throw new RuntimeException();													
+ } catch (RuntimeException e) {														
+ throw new RuntimeException();
+ } finally {
+ throw new Exception();
+ }
+ 
+ here at last the exception thrown is from finally, as finally is executed at last.Even though an exception is thrown inside a catch,it is forgotten because of finally.
+ 
+->java.lang.SecurityException:  runtime exception
+
+Both - ArrayIndexOutOfBoundsException and StringIndexOutOfBoundsException, extend IndexOutOfBoundsException
+NegativeArraySizeException 
+
+CHECKED EXCEPTION:
+==================
+Checked exceptions are subject to the Catch or Specify Requirement. All exceptions are checked exceptions, except for those indicated by Error, RuntimeException, and their subclasses.
+  i.e these must be handled or declared. They can be thrown by the programmer or by the JVM.
+  
+Common checked exceptions include the following:
+
+FileNotFoundException
+IOException     -  FileNotFoundException is a subclass of IOException
+InterruptedException - In case of threads
+	
+->The code that may throw checked exceptions must either enclosed in a try/catch block or declare the exception in throws class(i.e intimating caller method to handle).
+  Otherwise program will fail to compile.
+  
+Errors:
+======
+Errors extend the Error class. They are thrown by the JVM and should not be handled or declared. Errors are rare, but you might see these:
+ExceptionInInitializerError: Thrown by the JVM when a static(static block)  initializer throws an exception and doesn’t handle it
+		static {
+		int[] countsOfMoose = new int[3];
+		int num = countsOfMoose[-1];
+		}
+		public static void main(String[] args) { }      
+		
+		o/p:  Exception in thread "main" java.lang.ExceptionInInitializerError
+		Caused by: java.lang.ArrayIndexOutOfBoundsException: -1 			here 2 exceptions are shown.
+		
+StackOverflowError :Thrown by the JVM when a method calls itself too many times(this is called infinite recursion because the method typically calls itself without end)
+NoClassDefFoundError: Thrown by the JVM when a class that the code uses is available at compile time but not runtime.
+
+
+->If the superclass method does not declare an exception:
+  1) Rule: If the superclass method does not declare an exception, subclass overridden method cannot declare the checked exception but can declare unchecked exception.  
+	
+->If the superclass method declares an exception:
+	1) Rule: If the superclass method declares a checked exception, subclass overridden method can declare same, subclass checked exceptions but cannot declare parent checked exception,
+	         
+	
+->	why overriden method cannot declare parent checked exception? reason?
+try{
+
+}
+catch(--)
+{
+//some exception thrown here
+}
+catch(exceptionoftype thrown in above code)
+{
+//this won't execute even though catching exception of thrown type because 
+//above catch should have a try & catch within it.
+}
+
+UserDefinedException:
+
+package com;
+
+class UserDefinedException extends Exception  
+{
+	public UserDefinedException()
+	{
+		super();
+	}
+	public String getName() throws UserDefinedException
+	{
+		
+		throw new UserDefinedException();                    //instead of adding throws, we can also  include this stmt in try,catch block(remove all throws stmts).
+	}
+	public void setName() throws UserDefinedException
+	{
+		getName();
+	}
+}
+
+public class ExceptionsDemo {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+     
+     UserDefinedException excpt = new UserDefinedException();
+     try {
+		excpt.setName();
+	} catch (UserDefinedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+
+}
+
+
+================================================================================================
+Garbage collection:		
+------------------
+
+The Garbage collector of JVM collects only those objects that are created by new keyword(i.e heap memory),and objects in string constant pool.
+public static void gc()
+System.gc()  -> gc() a static method of System class.  This internally calls finalize() method.
+protected void finalize()  -> member of Object class.   You can override this method and do cleanup of objects which are not created using new.
+->You do need to know that System.gc() is not guaranteed to run, and you should be able to recognize when objects become eligible for garbage collection.
+->Garbage collection is optional. i.e JVM decides whether to invoke Garbage collector or not based on memory availability.
+->If the garbage collector fails to collect the object and tries to run it again later, the method doesn’t get called a second time
+
+Java has four types of garbage collectors:		
+->Serial Garbage Collector			  	-XX:+UseSerialGC
+->Parallel Garbage Collector			-XX:+UseParallelGC
+->CMS Garbage Collector					-XX:+ConcMarkSweepGC
+->G1 Garbage Collector					-XX:+UseG1GC
+JVM arg:   java  -Xms:	-Xmx:	-XXPermSize:	-XX:	-jar appl.jar
+
+Doc on JConsole (memory allocation)		-  http://docs.oracle.com/javase/7/docs/technotes/guides/management/jconsole.html
+
+->When we call System.gc() externally, finalize() method will be invoked only if any of the references are made null.
+->consider below scenario,
+   heap has 
+    case1  100 dead objects , 900 alive objects
+	case2  900 dead objects , 100 alive objects
+	
+	in which case garbage collection is faster?  
+ case2 - because GC will collect collects the live objects and cleans the remaining memory.
+========================================================================================================================================
+Serialization: - An interface
+==============
+->An object can be represented as a sequence of bytes that includes the object's data as well as information about the object's type and the types of data stored in the object.
+
+After a serialized object has been written into a file, it can be read from the file and deserialized that is, the type information and bytes that represent the object and its data 
+ can be used to recreate the object in memory.
+
+Most impressive is that the entire process is JVM independent, meaning an object can be serialized on one platform and deserialized on an entirely different platform.
+  Here class to which the serialized object belongs to must be available to JVM(on other platform).
+Classes ObjectInputStream and ObjectOutputStream are high-level streams that contain the methods for serializing and deserializing an object.
+	writeObject(),readObject() are used .
+
+	public class Employee implements java.io.Serializable
+	{
+			FileInputStream fileIn = new FileInputStream("/tmp/employee.ser");
+         ObjectInputStream in = new ObjectInputStream(fileIn);
+		Employee e = in.readObject();
+	FileOutputStream fileIn = new FileOutputStream("/tmp/employee.ser");
+         ObjectOutputStream in = new ObjectOutputStream(fileIn);
+		 in.writeObject(Employeeclassobject);
+	}
+	
+We do not need to implement any methods as Serializable interface do not have any methods. This is a marker interface/tag interface.
+	
+transient:  In case of serializing any object, we can exclude any of the data members of that object from serializing, by declaring it as transient.
+ After deserializing, transient variables will be assigned with default values (based on type.) Also static variables will not involve in serialization/deserialization.
+ but serialversionUID  is a static final long variable which is serialized & deserialized. This variable is used as reference to check whether 
+ instance created during deserialization is for the same class for which serialization is performed.
+->After an instance is serialized, if we change the value of a static member, the modified value will be available in the instance created using deserialization.
+Real time exmp:
+
+	1. Banking example: When the account holder tries to withdraw money from the server through ATM, the account holder information along with the withdrawl details
+	will be serialized (marshalled/flattened to bytes) and sent to server where the details are deserialized (unmarshalled/rebuilt the bytes)and 
+	used to perform operations. This will reduce the network calls as we are serializing the whole object and sending to server and further request for 
+	information from client is not needed by the server. 
+
+	2. Stock example: Lets say an user wants the stock updates immediately when he request for it. To achieve this, everytime we have an update, 
+	we can serialize it and save it in a file. When user requests the information, deserialize it from file and provide the information. 
+	This way we dont need to make the user wait for the information until we hit the database, perform computations and get the result. 
+
+java.lang.Number  is an example for Serializable interface. 
+refer http://www.jusfortechies.com/java/core-java/serialization.php      - detail .
+
+============================================================================
+Cohesion:
+---------
+  Object Oriented principle most closely associated with making sure that a class is designed with a single, well-focused purpose.
+  The more focused a class is, the cohesiveness of that class is more. The advantages of high cohesion is that such classes are much easier to maintain
+  (and less frequently changed) than classes with low cohesion. Another benefit of high cohesion is that classes with a well-focused purpose tend to be more reusable
+  than other classes.
+
+Coupling:
+--------
+   how often do changes in class A force related changes in class B.
+=======================================================
+Aggregation in java:  A class is holding other class object as ITS CLASS VARIABLE. HAS-A Relation. Child object exist even if Parent object doesn’t exist.
+i.e     class Employee{  
+    int id;  
+    String name;  
+    Address address;//Address is a class  
+    ... 
+	Employee()
+	{
+	      address = new Address();
+    }  here address is an object of class Address.
+	
+Employee and Address objects are tightly coupled. i.e Address object creation is dependent on Employee object creation.
+
+To make it loosly coupled
+      Employee(Address adr)
+	  {
+	    address = adr;
+	  }  OR
+	  setAddress(Address adr)
+	  {
+	     address = adr;
+      }
+Loose coupling is preffered over tight coupling, because easy to maintain/modify..
+
+Composition:   It is also called as HAS-A relation. Child and Parent objects are very closely dependant. Child cannot exist in the absence of Parent.
+------------
+====================================================================================
+Wrapper classes:  To convert premitices into Objects
+---------------
+Each Premitive type has a defined class. This class is wrapper class.
+int i = 10;
+Integer ref = new Integer(i);//auto boxing
+Integer iref = i;  //auto boxing
+
+int j = ref.intValueOf();  //unboxing
+int - premitive , Integer  corresponding Wrapper class.
+		 int i=Integer.parseInt("1");      *returns premitive type*
+		 System.out.println(i);	//1
+		 Integer obj1=Integer.valueOf(2);  *returns wrapperObject type*
+		 System.out.println(obj1);	//2
+		 Integer obj=Integer.valueOf("2");
+		 System.out.println(obj);	//2
+		 
+Integer bad2 = Integer.valueOf("123.45"); // throws NumberFormatException     because you are calling valueOf() on Integer class with double type parameter.
+		it looks fine at compile time as parameter is enclosed in "" i.e a string.
+		
+->Wrapper classes does not have a no-args constructor.
+->All wrapper objects are immutable. A wrapper object need more memory compared to premitive.so costly.
+
+ArrayList<Integer> arrayList = new ArrayList<Integer>();
+        arrayList.add(24);				Autoboxing  -> 24 a premitive internally converted to Integer a wrapperObject.
+
+ int num = arrayList.get(0);         Unboxing -> wrapperObject to premitive.
+
+wrapper objects are needed because Collection framework accepts only objects not premitives.
+
+java.lang.Number class is the superclass of classes Byte,Short,Integer,Long,Float,Double,BigDecimal, BigInteger.
+=================================================================================================================================
+
+Generics:   Generics also provide compile-time type safety that allows programmers to catch invalid types at compile time. 
+---------
+  List<? extends Number> numberlist - accept instances of Number or its subclasses. (Upper bound )
+  List<? super Integer> numberlist  -  accept instances of Integer or its superclasses like Number. (lower bound)
+  List<?> list -any object can be used
+class Box<T>
+{
+private T t;
+}
+class Box<T, S> {
+   private T t;
+   private S s;
+}
+
+
+Enum:
+  All enums implicitly extend java.lang.Enum. In Java, a class can only extend one parent 
+    and therefore an enum cannot extend any other class but implement interfaces.
+
+	public enum SitePointChannel {
+    JAVA,
+    MOBILE,
+    WEB,
+    PHP,
+    WORDPRESS,
+    JAVASCRIPT,
+    DESIGN
+  }
+Enum members are public static final.
+Enum can have fields and methods as well as implement interfaces.
+--------------------------------------------------
+public class Main
+{
+public static void main(String[] args) {
+System.out.println("Hello World");
+new B().B();
+}
+}
+class A 
+{
+    void A()
+    {
+        System.out.println(1);//o/p 1
+    }
+}
+class B extends A 
+{
+    void B()
+    {
+        A();
+    }
+} 
+-----------------------
+Object class methods list
+ 
+clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait
+
+--------------------------------------------------
+->Primitives are always passed by value. Object "references" are passed by value. 
+
+	So it looks like the object is passed by reference but actually it is the value of the reference that is passed.
+	An  example:         
+	Object o1 = new Object(); //Let us say, the object is stored at memory location 15000. 
+	        //Since o1 actually stores the address of the memory location where the object is stored, it contains 15000.         
+	 Now, when you call someMethod(o1); the value 15000 is passed to the method.        
+	  Inside the method someMethod():        
+	  someMethod( Object localVar) {   }         
+	 /*localVar now contains 15000, which means it also points to the same memory location where the object is stored.   
+	  Therefore, when you call a method on localVar, it will be executed on the same object.          
+	  However, when you change the value of localVar itself, for example if you do localVar=null,it then starts pointing to a different memory location. But the original variable o1 still 
+	            contains 15000 so it still points to the same object. */        
+--------------------------------------------------------------------------------------------------------------
+When you try to print obj i.e S.o.pln(obj)   internally toString() method is invoked.
+You can have a variable with name main
+
+->Compiler considers values of variables which are compile time constants like static var, final.
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+->if local variables are initialized through if-else case, observe carefully whether variables got initialized or not.
+   i.e at compile time compiler doesn't know whether if-else condition gets satisfied or not, so variables must be initialized in both if, else cases.
+->In java arrays are by default passed by reference to methods.

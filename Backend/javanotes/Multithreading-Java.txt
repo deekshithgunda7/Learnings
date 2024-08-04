@@ -1,0 +1,378 @@
+﻿MultiThreading:
+---------------
+Thread is a lightweight subprocess. Thread class belongs to java.lang package. Threads have their own stack.It's a way to take advantage of multiple cpu's available in a machine. 
+ For example, if one thread takes 50 milliseconds to do a job, you can use 10 threads to reduce that task to 5 milliseconds
+
+When we create a thread in java program, then it is called as user thread. We can not make a user thread to daemon thread if a thread is started.
+
+The daemon threads are the low priority threads that provide the background support to the user threads.It provides services to the user threads. 
+A child thread created from a daemon thread is also a daemon thread.
+create a daemon thread - setDaemon(true)
+java.util.concurrent.*  -  most of the multithreading packages
+
+Thread life cycle:
+------------------
+NEW            -  when create a thread
+Runnable       -  when you start a thread
+Running        - when thread start executing
+BLOCKED        - when notify(), notifyall(), sleep() are called on a thread
+Terminated     - completes execution
+
+-> When a thread is created, it inherits its priority from the thread that created it.( main thread). By default NORM_PRIORITY (5) is assigned.
+-> IllegalArgumentException - if thread priority is set to value which is outofrange (1,10).
+
+If two threads of the same priority are waiting for the CPU, the scheduler arbitrarily chooses one of them to run. The chosen thread runs until one of the following conditions is true: 
+  - A higher priority thread becomes runnable. 
+  - It yields, or its run method exits. 
+  - On systems that support time-slicing, its time allotment has expired
+
+  Then the second thread is given a chance to run, and so on, until the interpreter exits. 
+The Java runtime system's thread scheduling algorithm is also preemptive. If at any time a thread with a higher priority than all other Runnable threads becomes Runnable, 
+the runtime system chooses the new higher-priority thread for execution. The new thread is said to preempt the other threads.
+
+Creating a Thread:
+-----------------
+A thread can be created by two ways :
+		By extending the Thread class
+				or
+		By  implementing the Runnable interface
+
+Thread class - no other class inheritance is possible if we extend Thread class (java.lang.Thread)
+               all members are inherited, which is not required as we only use run()
+			   Creating a thread implies creating a class object.so multiple threads implies multiple objects
+Runnable is better - only 1 method. one single class object multiple threads.
+
+start  -  once started , u cannot start a thread again.Illegal state exception
+stop  -  stop the thread. again u cannot start the same thread
+join  -  t.join()  - means when main thread executes this statement main will not execute further statements untill t is finished
+yield  -  A hint to the scheduler that the current thread is willing to yield its current use of a processor. The scheduler is free 
+         to ignore this. Thread will be moved to BLOCKED state.which thread??
+sleep(..) vs wait()
+   ->  The wait() method releases the lock on an object and gives others chance to execute. 
+	   The sleep() method does not releases the lock on an object for specified time or until interrupt.
+   ->  The wait() method belongs to java.lang.Object class, thus can be called on any Object.
+       The sleep() method belongs to java.lang.Thread class, thus can be called on Threads.	   
+   ->  A waiting thread can be awake by notify() or notifyAll() method. A sleeping can be awaked by interrupt or time expires.
+   ->  The wait() method can only be called from Synchronized context i.e. using synchronized block or synchronized method. 
+       The sleep() method can be called from any context.
+
+Critical section/Race condition:
+multiple threads working on same shared object/variable.In this case end result will not be as expected.To handle this scenario
+ 
+Thread synchronization is used. synchronization can be achieved using synchronized block/method,AtomicInteger(java.util.concurrent.atomic package),volatile keyword for variables.
+
+example: Multiple persons trying to book a single ticket. Here consider persons as threads, ticket is resource.
+
+AtomicInteger is used to achieve synchronization when multiple threads works on single integer variable.incrementAndGet(),getAndIncrement(),....are used on that variable.
+
+volatile: applied to variables.variables specified as volatile are stored in main memory but not cached, that means these variables are visible to all the threads.
+
+Synchronized block is the more preferred way because it doesn't lock the object while synchronized methods lock the object. 
+Synchronized method will stop multiple synchronized blocks in the class, even though they are not related, from the execution and put them in the wait state to get the lock on the object.
+
+synchronization is costly, impacts performance as JVM allows one thread to work on shared object. synchronized block is prefferd over synchronized method
+
+Java synchronized keyword is re-entrant in nature it means if a java synchronized method calls another synchronized method which requires the same lock 
+ then the current thread which is holding lock can enter into that method without acquiring the lock.
+
+  public class Reentrant{
+
+  public synchronized outer(){
+    inner();
+  }
+
+  public synchronized inner(){
+    //do something
+  }
+}
+
+One Major disadvantage of Java synchronized keyword is that it doesn't allow concurrent read, which can potentially limit scalability. 
+  By using the concept of lock stripping and using different locks for reading and writing, you can overcome this limitation of synchronized in Java.
+  java.util.concurrent.locks.ReentrantReadWriteLock provides ready-made implementation of ReadWriteLock in Java.
+  
+java.util.concurrent.Lock    -     Lock lock = new Lock();  lock.locl(); lock.unlock();
+
+  ReadWriteLock rwLock = new ReentrantReadWriteLock();
+  Lock readLock = rwLock.readLock();  
+  Lock writeLock = rwLock.writeLock();
+  
+  readLock.lock();
+ 
+try {
+    // reading data
+} finally {
+ 
+    readLock.unlock();
+}
+
+writeLock.lock();
+ 
+try {
+    // update data
+} finally {
+ 
+    writeLock.unlock();
+}
+  
+One more limitation of java synchronized keyword is that it can only be used to control access to a shared object within the same JVM. 
+ If you have more than one JVM and need to synchronize access to a shared file system or database, the Java synchronized keyword is not at all sufficient. You need to implement a kind of global lock for that.
+
+https://javarevisited.blogspot.com/2011/04/synchronization-in-java-synchronized.html
+
+class level synchroonization:
+   synchronization applied on static methods or static blocks.
+Object level synchronization:
+   synchronization applied on instance methods or instance blocks.
+---------------------------------
+public class Counter{
+
+  private static int count = 0;
+
+  public static synchronized int getCount(){
+    return count;
+  }
+
+  public synchoronized setCount(int count){
+     this.count = count;
+  }
+
+}
+
+In this example of Java, the synchronization code is not properly synchronized because both getCount() and setCount() are not getting locked on the same object and can run in parallel which may result in the incorrect count. Here getCount() will lock in Counter.class object while setCount() will lock on current object (this). To make this code properly synchronized in Java you need to either make both method static or nonstatic or use java synchronized block instead of java synchronized method.
+
+
+=====================================================================================
+How To Manually Generate Interrupted Exception In Threads:
+
+class ManuallGenInterruptException extends Thread
+{
+	public ManuallGenInterruptException()
+	{
+	
+	}
+	public void run()
+	{
+		for(int i =0;i<4;i++)
+		{
+			System.out.println("print i "+i);
+			try {
+			Thread.sleep(1000);
+			}catch(InterruptedException e)
+			{
+				System.out.println("exception");
+			}
+		}
+	}
+}
+public class ThreadInterruptDemo {
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		ManuallGenInterruptException obj = new ManuallGenInterruptException();
+		obj.start();
+		obj.interrupt();
+	}
+}
+print i 0
+exception
+print i 1
+print i 2
+print i 3
+====================================================================================
+Program/Code To Create Deadlock Between Two Threads In Java:
+
+public class ThreadsDeadLockDemo {
+
+	static int var1 = 10;
+	static int var2 = 20;
+	static Object ObjectLock1 = new Object();
+    static Object ObjectLock2 = new Object();
+	
+	
+	public synchronized static void main(String[] args) {
+		// TODO Auto-generated method stub
+  
+		Thread t1 = new Thread(new Runnable() {							//Anonymous way of creating thread  without extending Thread class, or implementing Runnable
+				public void run()
+				{
+					synchronized(ObjectLock1)
+					{
+					System.out.println("print thread1 ");
+					try {
+						Thread.sleep(1000);
+						synchronized(ObjectLock2)
+						{
+						System.out.println("aquired lock ");
+						}
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					}
+					
+				}
+		});
+		t1.start();
+		
+		Thread t2 = new Thread(new Runnable() {
+			public void run()
+			{
+				synchronized(ObjectLock2)
+				{
+				System.out.println("print thread1 ");
+				try {
+					Thread.sleep(1000);
+					synchronized(ObjectLock1)
+					{
+					System.out.println("aquired lock in thread2");
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				}
+				
+			}
+	});
+	t2.start();
+	}
+
+}
+o/p
+print thread1 
+print thread1 
+
+PROGRAM NOT EXITED.... BECAUSE Deadlock OCCURED.  As thread t1 aquired lock on ObjectLock1 and waiting for ObjectLock2, whereas thread2 aquired lock on ObjectLock2 
+    and waiting for ObjectLock1. hence infinite waiting.
+
+To avoid deadlock
+in thread t1, 
+     synchronized(ObjectLock1)
+	 {
+		....
+		synchronized(ObjectLock2)
+		{
+		     ..
+		}
+     }
+in thread t2
+   
+	 synchronized(ObjectLock1)        // it will wait until thread t1 releases ObjectLock1 
+	 {
+		....
+		synchronized(ObjectLock2)
+		{
+		     ..
+		}
+     }
+
+Constructor can not be synchronized.
+measures you should take to avoid deadlock:
+--------------------------------------------
+
+1. Lock specific member variables of the class rather than locking whole class.
+2. if possible try to use join method ,although it may refrain us from taking full advantage of multithreading environment because threads will start and end sequentially, but it can be handy in avoiding deadlocks.
+3. If possible try to avoid nested synchronization blocks.	
+
+Threads can acquire object lock by entering synchronized methods.Threads can acquire lock on  class by entering the static synchronized methods.
+
+Multiple objects of class may exist and every Object has its own lock.In class lock multiple objects of class may exist but there is always one class level lock available. 
+
+holdsLock(Object) method can be used to determine whether current thread holds the lock on monitor of specified object.	
+
+When a Thread calls wait() on any Object, it must have the monitor on Object that it will leave and goes in wait state until any other Thread call notify() on this Object. Similarly when a thread calls notify() on any Object, it leaves the monitor on the Object and other waiting threads can get the monitor on the Object. Since all these threads require Thread to have a Object monitor,that can be achieved only by synchronization.That is why wait(),notify() and notifyAll() method have to be called from the synchronized context.
+
+=====================
+Producer-consumer problem - write a program
+  wait()  , notify() , notifyall()
+---------------------------------------------------	 
+Callable interface:
+------------------
+->We cannot make a thread return result when it terminates, i.e when run() completes.
+->For a Callable, the call() method needs to be implemented which returns a result on completion. Note that a thread can’t be created with a Callable,
+   it can only be created with a Runnable. Callable is similar to Runnable, in that it encapsulates a task that is meant to run on another thread
+ public Object call()
+ {
+  return x;
+ }
+ When the call() method completes, result must be stored in an object known to the main thread, so that the main thread can know about the result that the thread returned. 
+ 
+ Future is used to store a result obtained from a different thread.
+ A FutureTask can be created by providing its constructor with a Callable. Then the FutureTask object is provided to the constructor of Thread to create the Thread object. 
+  Thus, indirectly, the thread is created with a Callable. 
+ 
+import java.util.Random; 
+import java.util.concurrent.Callable; 
+import java.util.concurrent.FutureTask; 
+  
+class CallableExample implements Callable 
+{ 
+  
+  public Object call() throws Exception 
+  { 
+    Random generator = new Random(); 
+    Integer randomNumber = generator.nextInt(5); 
+  
+    Thread.sleep(randomNumber * 1000); 
+  
+    return randomNumber; 
+  } 
+  
+} 
+  
+public class CallableFutureTest 
+{ 
+  public static void main(String[] args) throws Exception 
+  { 
+  
+    // FutureTask is a concrete class that 
+    // implements both Runnable and Future 
+    FutureTask[] randomNumberTasks = new FutureTask[5]; 
+  
+    for (int i = 0; i < 5; i++) 
+    { 
+      Callable callable = new CallableExample(); 
+  
+      // Create the FutureTask with Callable 
+      randomNumberTasks[i] = new FutureTask(callable); 
+  
+      // As it implements Runnable, create Thread 
+      // with FutureTask 
+      Thread t = new Thread(randomNumberTasks[i]); 
+      t.start(); 
+    } 
+  
+    for (int i = 0; i < 5; i++) 
+    { 
+      // As it implements Future, we can call get() 
+      System.out.println(randomNumberTasks[i].get()); 
+  
+      // This method blocks till the result is obtained 
+      // The get method can throw checked exceptions 
+      // like when it is interrupted. This is the reason 
+      // for adding the throws clause to main 
+    } 
+  } 
+} 
+
+--------------------------
+ ExecutorService executor = Executors.newFixedThreadPool(5);
+        for (int i = 0; i < 10; i++) {
+            Runnable worker = new WorkerThread("" + i);             //here workerThread is class which extends Thread
+            executor.execute(worker);								//executor.submit(worker);
+          }
+        executor.shutdown();
+->we can access submit() and execute() from the ExecutorService interface because it also extends the Executor interface which declares the execute() method.		
+
+what is the difference between execute and submit?
+1. The submit() can accept both Runnable and Callable task but execute() can only accept the Runnable task.
+2. The submit() method is declared in ExecutorService interface while execute() method is declared in the Executor interface.
+3. The return type of submit() method is a Future object but return type of execute() method is void.
+==================================================
+starvation : Many threads are constantly competing for access to the same synchronized block, there is a risk that one or more of the threads 
+             are never granted access - that access is always granted to other threads. This is called starvation. 
+
+CyclicBarrier: it is a barrier that all threads must wait at, until all threads reach it, before any of the threads can continue.
+
+CyclicBarrier barrier = new CyclicBarrier(2);  2 threads
+barrier.await();

@@ -1,0 +1,343 @@
+DDL - CREATE , ALTER , RENAME ,DROP, TRUNCATE , COMMENT
+
+
+
+CREATE - CREATE TABLE TABLENAME(columnname datatype constraint,......)
+         CREATE DATABASE databasename
+ALTER  - ALTER TABLE TABLENAME COLUMN columnname datatype constraint
+            alter table employee add column deptid int ;
+  alter table employee drop column deptname;
+  alter table employee rename column department to deptname;
+  alter table department add foreign key (deptid) references employee(emp_id);
+RENAME - RENAME TABLE oldtablename TO newtablename
+DROP   - DROP TABLE TABLENAME (completely remove table from database)
+         DROP DATABASE databasename
+TRUNCATE- TRUNCATE TABLENAME  (TRUNCATE, DELETE are logically same.Deletes rows from table.)
+          TRUNCATE operation cannot be rolledback
+
+  
+DML - SELECT, INSERT , UPDATE , DELETE
+
+DELETE - DELETE FROM TABLENAME WHERE condition.
+
+DCL - GRANT , REVOKE
+  GRANT - GRANT ALL PRIVILEGES ON tablename TO userdetails
+  FLUSH PRIVILEGES    -> wil save the above command changes.
+
+   REVOKE -  REVOKE ALL PRIVILEGES ON tablename FROM userdetails
+      FLUSH PRIVILEGES
+
+TCL - COMMIT , ROLLBACK, SAVEPOINT, SET TRANSACTION
+
+
+DATA MODELLING:
+--------------
+1.NORMALIZATION 
+2.ENTITY - RELATIONSHIP DIAGRAM
+
+
+ENTITY - RELATIONSHIP DIAGRAM :
+------------------------------
+TABLE NAMES - OBJECTS ARE MAIN ENTITIES - represented by RECTANGLE
+ATTRIBUTES - i.e columns - represented by OVAL
+WEAK ENTITY - entiry completely dependent on other entity - DOUBLE RECTANGLE
+RELATIONSHIP  - between two entities - repesented by Rambos
+WEAK RELATIONSHIP - realation between strong and weak table - represented by DOUBLE RAMBOS
+SELF RELATIONSHIP - table related to itself.
+
+->one to one , one to many ,many to one, many to many relationships called CARDINALITY RATIO.
+
+-> Total , partial participation between entities.
+   Total participation - both entities are equally involved in relation - represented by DOUBLE LINE
+   Partial participation - not equally involved - represented by SINGLE LINE
+
+ATTRIBUTES:
+----------
+Composite : can be divided into further.like address into state, country,...
+Simple : can't be divided further
+Single Valued : single value
+Multi Valued : rangle of values - represented by DOUBLE OVAL
+Stored : Birthdate
+Derived : derived from stored attributes. e.x: age derived froom birthdate. represented by DASHED OVAL
+Complex : combination of above attributes
+
+-----------------------
+Entity set - set of attributes of an entity
+
+Keys:
+-----
+Primary Key 
+Foriegn Key    - Column whose values are matching with values of primary key column of other table
+Candidate Key  - UNIQUE + NOT NULL. minimal set of attributes with which identify a row uniquely. More than one candidate key allowd
+    
+Super Key      - combination of 2 or more attributes which can identify a tuple uniquely
+Alternate Key  - candidate key other than primary key
+
+
+
+NORMALIZATION:  Oganise table such the redundancy , dependancy are reduced. INF, 2NF, 3NF, BCNF, 4NF, 5NF, 6NF
+------------- 
+1NF - ALL records are unique
+2NF - 1NF + no composite key(single column primary key)  (devide tables into 2 tables)
+3NF - 2NF + no Transtive functional dependancy
+Transitive Functional Dependancy:
+     changing values of non key column also requires change in values of other columns.
+
+
+
+
+CONSTRAINTS:
+----------- 
+ NOT NULL , UNIQUE, CHECK, DEFAULT, INDEX
+
+DATA TYPES:
+------------
+INT , FLOAT , DOUBLE, CHAR, VARCHAR, BOOLEAN,
+
+
+AGGREGATE FUNCTIONS:
+--------------------
+MIN, MAX, COUNT, SUM, AVG
+
+OPERATORS:
+----------
+AND , OR , NOT , IN , BETWEEN, LIKE, DISTINCT, EXISTS, ISNULL
+
+
+FOREIGNKEY(columnname) references tablename(primarykeycolumn)
+
+SQL JOINS: 
+==========
+INNER JOIN: The INNER JOIN keyword selects all rows from both the tables as long as the condition satisfies. 
+This keyword will create the result-set by combining all rows from both the tables where the condition satisfies i.e value of the common field will be same.
+
+SELECT StudentCourse.COURSE_ID, Student.NAME, Student.AGE FROM Student INNER JOIN StudentCourse ON Student.ROLL_NO = StudentCourse.ROLL_NO;
+
+OUTER JOIN:
+----------
+  1)LEFT JOIN( LEFT OUTER JOIN):
+  ----------------------------
+    This join returns all the rows of the table on the left side of the join and matching rows for the table on the right side of join. 
+	The rows for which there is no matching row on right side, the result-set will contain null. LEFT JOIN is also known as LEFT OUTER JOIN
+	
+	SELECT Student.NAME,StudentCourse.COURSE_ID  FROM Student LEFT JOIN StudentCourse  ON StudentCourse.ROLL_NO = Student.ROLL_NO;
+
+  2)RIGHT JOIN( RIGHT OUTER JOIN):
+  ------------------------------
+    RIGHT JOIN is similar to LEFT JOIN. This join returns all the rows of the table on the right side of the join and matching rows for the table on the left side of join. 
+	The rows for which there is no matching row on left side, the result-set will contain null. RIGHT JOIN is also known as RIGHT OUTER JOIN.
+	
+   SELECT Student.NAME,StudentCourse.COURSE_ID  FROM Student RIGHT JOIN StudentCourse  ON StudentCourse.ROLL_NO = Student.ROLL_NO;
+   
+  3)FULL JOIN( FULL OUTER JOIN):
+  -----------------------------
+    FULL JOIN creates the result-set by combining result of both LEFT JOIN and RIGHT JOIN. 
+	The result-set will contain all the rows from both the tables. The rows for which there is no matching, the result-set will contain NULL values.
+	
+	SELECT Student.NAME,StudentCourse.COURSE_ID FROM Student FULL JOIN StudentCourse  ON StudentCourse.ROLL_NO = Student.ROLL_NO;
+	
+SELF JOIN
+---------
+ a table is joined to itself. That is, each row of the table is joined with itself and all other rows depending on some conditions.
+ In other words we can say that it is a join between two copies of the same table.  
+  
+ SELECT a.ROLL_NO , b.NAME FROM Student a, Student b WHERE a.ROLL_NO < b.ROLL_NO; 
+ 
+CARTESIAN JOIN:
+---------------
+  The CARTESIAN JOIN is also known as CROSS JOIN. In a CARTESIAN JOIN there is a join for each row of one table to every row of another table. 
+  This usually happens when the matching column or WHERE condition is not specified.
+ In the absence of a WHERE condition the CARTESIAN JOIN will behave like a CARTESIAN PRODUCT . 
+    i.e., the number of rows in the result-set is the product of the number of rows of the two tables.
+ In the presence of WHERE condition this JOIN will function like a INNER JOIN.
+ 
+ SELECT table1.column1 , table1.column2, table2.column1... FROM table1 CROSS JOIN table2;
+ 
+
+ ======================
+  
+ Queries:
+ 
+->print employee details of who has highest salary from each department
+  
+  select empname , salary , deptname from employee e inner join department d on e.deptid = d.deptid where salary in (select max(salary) from employee group by deptid);
+  
+->Nth highest salary.
+
+ (select * from employee order by salary desc limit 2)     - this will return 2 highest salary values.
+ 
+  select min(salary) from (select * from employee order by salary desc limit 2) a;
+  
+    a is refered to table which is result of inner query
+	
+->sql query to find second highest salary of employee in each department (  analytic funtion in mysql)
+ ==================
+SQL Injection:
+   when adding(injecting) special characters to user input which are passed to simple sql statements, the end results (on executing the query)are not as expected. 
+	
+Statement vs PreparedStatement vs CallableStatement
+ Statement st = con.createStatement();   
+    st.execute(query);
+	st.executeQuery(query);
+    st.executeUpdate(query); - for all the 3, every time query is compiled before execution.
+ PreparedStatement ps = con.prepareStatement(query);  - query compiled only once.
+    ps.executeUpdate();   - no compilation , only execution.
+	for each sql query, new prepareStatement is required, which is disadvantage.
+	
+When we fire a query to be executed for a relational database, it goes through following steps.
+	Parsing of SQL query
+	Compilation of SQL Query
+	Planning and optimization of data acquisition path
+	Executing the optimized query and return the resulted data
+	
+->When we use Statement, it goes through all the four steps but with PreparedStatement first three steps are executed when we create the prepared statement. 
+  So execution of query takes less time and more quick that of Statement.
+->Another benefit of using PreparedStatement is that we can use Batch Processing through addBatch() and executeBatch() methods. We can create a single prepared statement and use it to execute multiple queries.
+  
+  The executeBatch() returns an array of integers, and each element of the array represents the update count for the respective update statement.
+
+  
+    Statement stmt = conn.createStatement();
+	String SQL = "INSERT INTO Employees (id, first, last, age) " +
+             "VALUES(200,'Zia', 'Ali', 30)";
+	stmt.addBatch(SQL);
+
+	String SQL = "INSERT INTO Employees (id, first, last, age) " +
+             "VALUES(201,'Raj', 'Kumar', 35)";
+
+	stmt.addBatch(SQL);
+
+	String SQL = "UPDATE Employees SET age = 35 " +
+             "WHERE id = 100";
+	stmt.addBatch(SQL);
+
+	int[] count = stmt.executeBatch();
+----
+    String SQL = "INSERT INTO Employees (id, first, last, age) " +
+             "VALUES(?, ?, ?, ?)";
+
+// Create PrepareStatement object
+PreparedStatemen pstmt = conn.prepareStatement(SQL);
+
+//Set auto-commit to false
+conn.setAutoCommit(false);
+
+// Set the variables
+pstmt.setInt( 1, 400 );
+pstmt.setString( 2, "Pappu" );
+pstmt.setString( 3, "Singh" );
+pstmt.setInt( 4, 33 );
+// Add it to the batch
+pstmt.addBatch();
+
+// Set the variables
+pstmt.setInt( 1, 401 );
+pstmt.setString( 2, "Pawan" );
+pstmt.setString( 3, "Singh" );
+pstmt.setInt( 4, 31 );
+// Add it to the batch
+pstmt.addBatch();
+Create an int[] to hold returned values
+int[] count = stmt.executeBatch();
+	
+	
+ 
+ 
+Some points to remember about JDBC PreparedStatement are:
+
+-> PreparedStatement helps us in preventing SQL injection attacks because it automatically escapes the special characters.
+      select name, country, password from Users where email = 'david@gmail.com\' or \'1\'=\'1\' and password=''
+-> PreparedStatement allows us to execute dynamic queries with parameter inputs.
+-> PreparedStatement provides different types of setter methods to set the input parameters for the query.
+-> PreparedStatement is faster than Statement. It becomes more visible when we reuse the PreparedStatement or use it’s batch processing methods for executing multiple queries.
+-> PreparedStatement helps us in writing object Oriented code with setter methods whereas with Statement we have to use String Concatenation to create the query. 
+   If there are multiple parameters to set, writing Query using String concatenation looks very ugly and error prone.
+-> PreparedStatement returns FORWARD_ONLY ResultSet, so we can only move in forward direction.
+   Unlike Java Arrays or List, the indexing of PreparedStatement variables starts with 1.
+-> One of the limitation of PreparedStatement is that we can’t use it for SQL queries with IN clause because PreparedStatement doesn’t allow us to bind 
+   multiple values for single placeholder (?).
+   
+
+==============================================
+Stored procedures and Callable Statement:
+
+->Callable statement is used to call stored procedures from java application.
+->In java set of repeatable statements are placed in a method and called wherever required, similarly in database set of queries to be executed repeatadly
+  are placed in a procedure. These procedures are permenantly stored in database so called stored procedures.
+
+-> DBA is responsible for writing stored procedures.
+-> Each database has its own language to write stored procedure.
+         Oracle - PL/SQL
+		 MYSQL  - Procedure language
+		 Sql server  - TSQL
+   CallableStatement st = con.prepareCall("procedurename()");		 	
+		 st.execute();          - No executeQuery(), executeUpdate()
+		 
+->Similar to method, stored procedure can accept parameters but only of 3 types.   (Z:=X+Y)
+         IN - to provide input values        (X,Y)
+		 OUT - to collect output              (Z)
+		 INOUT - combination of both          (X:=X+1 ,  X)
+		 
+=========
+Triggers:
+   like  event listners, invoked on execution of certain operation.
+   
+  CREATE TRIGGER triggername [BEFORE/AFTER] [INSERT/UPDATE/DELETE] ON tablename FOR EACH ROW 
+   BEGIN 
+     ....
+	END
+   
+   
+   CREATE TRIGGER before_employee_update 
+    BEFORE UPDATE ON employees
+    FOR EACH ROW 
+BEGIN
+    INSERT INTO employees_audit
+    SET action = 'update',
+     employeeNumber = OLD.employeeNumber,
+        lastname = OLD.lastname,
+        changedat = NOW(); 
+END$$
+DELIMITER ;
+====================================================================
+DISTINCT column name
+ 
+length(column name)
+ 
+count(DISTINCT column name)
+ 
+like 'a%'
+trim(to_char(emp_id,'99999')) LIKE '__3%'  OR trim(to_char(emp_id,'99999')) LIKE '__7%'))  -  empID containing a digit of '3' or '7' in 3rd position.
+                                                
+SUBSTR(string, startindex, no of characters)
+ 
+ROUND(column)  - rounding to next integer  ,  ROUND(column, rounded to how many decimals)
+floor()
+ceil()  
+ 
+replace(salary, '0', '')
+ 
+IF(G.GRADE < 8 , NULL, S.NAME)
+ 
+DATEDIFF(CURDATE() , datecolumn)   -    CURDATE() gives current date.
+DATE('2020-10-01 12:35:06')  -  result = '2020-10-01'
+ 
+SELECT * FROM employees WHERE hire_date < (SELECT hire_date FROM employees WHERE emp_name = 'ADELYN');  - list the employees who are senior to ADELYN.
+ 
+Write a query in SQL to list the employees whose salary is same as the salary of FRANK or SANDRINE
+    SELECT * FROM employees  WHERE salary IN (SELECT salary FROM employees e WHERE (emp_name = 'FRANK' OR emp_name = 'SANDRINE') AND employees.emp_id <> e.emp_id);
+                   here AND condition is must otherwise returns rows of FRANK & SANDRINE
+ 
+ 
+select name , to_char(hire_date,'MONTH,DD,YYY') from employee;               ex:  print hire date in 'Feb 20 1991'
+ 
+if inner query returns more than one row, then properly use conditional operator in where condition of outer query.
+  Example: query in SQL to list the employees whose salary is more than the total remuneration of the SALESMAN.
+  
+ select * from employees where salary > (select salary+commission from employees where job_name = 'SALESMAN'); - WRONG . Inner wuery returns multiple rows, but using '>' in outer query
+  
+ select * from employees where salary > (select max(salary+commission) from employees where job_name = 'SALESMAN'); - CORRECT
+ 
+==============================================
+https://www.w3resource.com/sql-exercises/employee-database-exercise/index.php#SQLEDITOR    -  SQL queries practise.
+https://www.hackerrank.com/interview/interview-preparation-kit -  programming practise for interviews

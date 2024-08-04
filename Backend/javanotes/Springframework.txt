@@ -1,0 +1,811 @@
+Why Framework?
+     to develop Enterprise application which solve real time problems , complex coding is required
+     
+->The aim is to write proper business logic not worrying about other areas like , security , performance, memory leaks etc
+  So, Frame work allows you to work more on business logic by providing necessary coding to handle performance, memory , security ,robust code
+
+ Spring: frameworks of framework.i.e we can easily integrate other frameworks into spring framework. its open source, light wieght.
+ Spring MVC: It is entirely interfaces based. Model View Controller architecture
+
+Spring is 
+  light weight    - It does not need any platform(O.s) level libraries to run.
+  loosely coupled - interface implementaion is followed. i.e Association relation
+
+Key principles of Spring:
+   Runtime polymorphism -  Achived through Dependancy Injection
+   Association
+
+Whenever we develop an enterprise application, better to follow layered architecture. Each layer should be loosly coupled with other layers so that modyfications 
+in one layer donot impact other layers. Also while updating applications with latest technologies will not impact business logic.
+
+Spring Architecture 
+  XML config -> Spring IOC/MVC Container -> Controller <-> Model (POJO classes,Businesslogic)
+
+SpringIOC Container : Container is used to instantiate objects
+    Core Container  -  BeanFactory interface. 
+                       Resource resource = new ClassPathResource("xmlfilename.xml"); //here we are loading the configuration xml files
+                       BeanFactory factory = new XmlBeanFactory(resource);
+                    -  Also called Lazy container as it create objects on demand.
+		    -  Takes more time, as on each user request (.getBean(beanid)) object creation is needed.
+
+    J2EE Container  -  ApplicationContext , ConfigurableApplicationContext 
+                       ApplicationContext contect = new ClassPathXmlApplicationContext("xmlfilename.xml");//here we are loading the configuration xml files
+		       Employee e1 = context.getBean("emp",Employee.class);
+ 		    -  Also known as Eager Container, as it creates objects at the loading stage itself( only if bean scope is Singleton).
+                    -  This technique is prefferd over Lazy container.
+ApplicationContext is a eager initialization. But sometimes, you may need to mark some or all beans to be lazy initialized.
+   @Lazy  - for a particular bean(class)
+ <bean id = "" class ="" lazy-init=true>  -  for a particular bean
+ <beans default-lazy-init="true">  //for all the beans
+
+SpringMVC Container  :  
+  Core Container  - 
+  J2EE Container  -
+  Web Container   - WebApplicationContext - interface  - This container is used for web application development.
+
+Container :
+  - Read XML
+  - Create Objects
+  - Manage lifecycle (init ,destroy method)
+  - Dependancy Injection
+
+-> To start a container, we use init method. Usually in  init method we implement Object creation code.
+
+
+XML file looks like
+<bean id="emp" class="com.Employee">
+ <property name= "empid" value="101"/>
+ <property name="empname" value="shiva"/>
+</bean>
+
+<bean id="addr" class="com.Address">
+  <property name="city" value="hyderabad">
+  <property name="state" value="telangana">
+</bean>
+
+To access objects:
+2 ways:                           (import org.springframework.beans)
+
+1)
+Resource resource = new ClassPathResource("xmlfilename.xml"); //here we are loading the configuration xml files
+BeanFactory factory = new XmlBeanFactory(resource);
+
+Employee e = factory.getBean("emp", Employee.class); //here emp is bean id
+                                     Employee.class is type casting the result ot Employee object
+
+2)
+ApplicationContext contect = new ClassPathXmlApplicationContext("xmlfilename.xml");//here we are loading the configuration xml files
+Employee e1 = context.getBean("emp",Employee.class);
+
+In case 1, Employee object is created for bean emp only when you make a call to getBean(..);
+In case 2, ApplicationContext will construct objects at the loading phase of xml file. i.e objects will be created for all the beans defined in xml file.
+
+->if we have 2 different XML files and there is dependancy between these two(i.e Association relation between 2 classes). Then we have to load both the XML files at once.
+   This can be achieved using below technique
+        String[] files = new String[]{springxml1.xml , springxml2.xml};   //springxml1 has a bean which refers to bean present in springxml2 
+		ApplicationContext contect = new ClassPathXmlApplicationContext(files);
+
+-> Instead of XML based configuration, we can use Annotation based configuration for creating beans
+
+      @Configuration                     // indicates configuring the objects.container
+	  @ComponentScan("package path")     //searches for required beans in specified package
+	  public class SpringIn5StepsApplication {  
+		public static void main(String[] args) {
+
+		AnnotationConfigApplicationContext applicationContext = 
+ 		       new AnnotationConfigApplicationContext(SpringIn5StepsApplication.class);
+		BinarySearchImpl binarySearch = 
+			applicationContext.getBean(BinarySearchImpl.class); //here BinarySearchImpl is a bean class
+	        AnnotationConfigApplicationContext.close();
+           }
+         }
+
+BeanScope:
+  -> Singleton  -  For each bean Single object for entire JVM. 
+                 Employee e1 = factory.getBean("emp", Employee.class);
+                 Employee e2 = factory.getBean("emp", Employee.class);
+		 Employee e3 = factory.getBean("emp", Employee.class);         
+		
+     In the above case, only once Employee constructor is invoked if the bean scope is Singleton.
+     If Employee class constructor is made private, still IOC can access private constructor and is able to create objects.
+	            Internally below approch is used to access private constructor.
+			Class c = Class.forName("beanid");
+			Constructor con[] = c.getDeclaredConstructors();
+			con[0].setAccessible(true);
+			con[1].newInstance(null);
+	 
+<bean id="emp" class="com.Employee" scope="prototype">
+a. Singleton     - one object for jvm  - this is default
+b. prototype     - every time new object
+c. Request       - one object per entire request
+d. Session       - one object per entire session
+e. Global-session- one object per entire global session
+
+In XML file
+<bean id="emp" class="com.Employee" init-method="initialize" destroy-method="destructor">
+
+initialize() and destructor() are the customized methods defined in POJO/Beans class.
+initialize() method is called after successfull creation of objects by IOC Container.
+destructor() method is called when you execute below statement
+	context.close();  //here context is ApplicationContext object. IOC container is shutdown
+
+Dependancy Injection:
+
+->Aggregation(HAS-A Relation) in java is tightly coupled. i.e Creation of one object depends on another object
+  loose coupling is prefered over tight coupling.
+  
+-> DAO class has a dependancy with Database for connections.
+   Businesslogic classes has dependancy with DAO classes , Transaction service, Security Service,....
+   Controller class has dependancy with Businesslogic classes to access methods.
+
+Types of Dependanc Injection:
+    Setter method
+    parameterized constructor	
+
+Dependancy Injection can be achieved in spring framework through 2 ways, constructor or setters using XML file.
+
+<constructor-arg> tag is used in xml file to pass arguments to constructor.
+ <constructor-arg ref="addr">      //here we use ref tag. "addr" is the bean id for Address class
+
+<property> tag is used to set attributes of class using setters.
+ <property name="address" refs="addr">  // here address is the class reference declared as Attribute of Employee
+
+<bean id=" " class= " ">
+  //defaullt constructor is invoked
+</bean>
+
+<bean id =" " class= " ">
+  <property name = " " value=" ">          // initializing the class members using setter
+  <constructor-arg value= " ">             // initializing the class members using parameterized constructor(2 params)
+                   value=" "/>                    
+</bean>
+
+-> Constructor with multiple parameters all of same type, to properly initialize members with corresponding values, 'index' tag is introduded.
+      <bean id=" " class= " ">
+            <constructor-arg value= " " index="0">
+			                 value= "  " index="1"/>
+		</bean>
+ 
+-> If constructors are overloaded, constructor invocation can be differentiated using 'type' tag
+      <bean id=" " class= " ">
+            <constructor-arg value= " " type="int"/>
+			<constructor-arg value= " " type="String"/>
+		</bean>
+
+->In java Objects can be passed 'by value' , 'by reference' 
+   Test t = new Test()
+   A ref = new A();
+   t.method(new A());  // pass by value  
+   t.method(ref);   // pass by reference
+ 
+ Same can be achieved using XML config using 'ref' tag and inner beans.
+     pass by reference :   
+	         <bean id = "  " calss=" ">
+			    <property name=" " ref="beanid of other class">   // initializing the class members (member is of type other class) using setter
+				<constructor-arg   ref="beanid of other class">	  // initializing the class members (member is of type other class) using constructor
+			 </bean>	
+     pass by value:
+            <bean id= " " class = "Test">
+                <property name="Engine" >             //Engine is a class and is a member of Test class
+               	    <bean class = "Engine">
+					   <property name = "" value=" "/>             //initializing members of Engine class
+					</bean>
+				</property>
+			</bean>
+			
+-> In case of Setter Dependancy Injection, it is not mandatory to pass values through XML. if not passed , default values are stored.
+   But for parameterized constructor Dependancy Injection, we must need to pass parameters through XML.   
+-> If class members are of type collection (List,Set,Map), then DI should be done as follow.
+
+    class Test{
+	  private List fruits;
+	  private Set Cricketers;
+	  private Map Country;
+	 }
+	 
+	 <bean id = "t" class="Test">                      // internally ArrayList is implemented. Even for normal arrays, we use same <list> tag
+	 <property name = "fruits">
+		  <list>
+		     <value>apple</value>
+			     ....
+		  </list>
+		 </property>
+	 </bean>
+	 
+	 <bean id = "t" class="Test">                      // internally LinkedHashSet is implemented
+	    <property name = "Cricketers">
+		  <Set>
+		     <value>Sachin</value>
+			     ....
+		  </Set>
+		 </property>
+	 </bean>
+   
+      <bean id = "t" class="Test">                      // internally LinkedHashMap is implemented. 
+		<property name = "Country">
+		  <map>
+		     <entry key=" " value=" "/>
+			     ....
+		  </map>
+		 </property>
+	 </bean>   
+
+If we want to use any other collection types other than above defaullt collection implementations, we have to use XML schema config instead of default dtd
+
+ i.e <beans xmlms=" beans-namespace">
+ 
+ <Property name = "Fruits">
+    <util:list list-class= "java.util.vector">
+        <value>...</value>
+		  ....
+    </util:list>
+ 
+ 
+ <util:set set-class = "java.util.Set">
+->This schema based configuration is not supported by Core Container. J2EE Container is recommended.
+
+Difference between setter and construct DI:
+        Suppose a  Class with 3 properties and a parameterized constructor with 3 input parameters. 
+
+Partial dependency: can be injected using setter injection but it is not possible by constructor. Suppose there are 3 properties in a class, having 3 arg constructor and setters methods.
+        In such case, if you want to pass information for only one property, it is possible by setter method only.
+Overriding: Setter injection overrides the constructor injection. If we use both constructor and setter injection, IOC container will use the setter injection.
+Changes: We can easily change the value by setter injection. It doesn't create a new bean instance always like constructor. So setter injection is flexible than constructor injection.
+
+
+Auto wiring:
+   To decrease manual writing of XML files, auto wire concept is introduced. Property values can be injected automatically by using auto wire.
+
+Spring offers following types of auto wiring
+   >>byname
+   >>bytype
+   >>constructor
+<bean id="emp" class="com.Employee" autowire="">
+
+class Student
+{
+  String sname;
+  int id;
+  Hostel hostelref;
+ }
+ class Hostel
+ {
+   String city;
+   String code;
+ }
+->autowire="byName" 
+   autowire byName implies class attribute name must match with bean id to which it attribute value is refering to.
+   <bean id="St" class="Student autowire="byName">
+     <property name="same" value="shiva"/>
+	 <property name="id" value="977327"/>                     //here hostelref is not initialized externally. but using autowire it will be initialized.
+	</bean>              
+
+   <bean id="hostelref" class="Hostel">            //here beanid "hostelref" is the name of attribute in Student class
+     <property name="city" value=".."/>
+	 <property name= "code" value=".."/>
+	</bean>
+	 
+->autowire="byType"
+    <bean id="Hostel" class="Hostel">            //here beanid "Hostel" is the type of attribute (hostelref)in Student class
+     <property name="city" value=".."/>
+	 <property name= "code" value=".."/>
+	</bean>
+
+->autowire="constructor"
+      <bean id="St" class="Student autowire="constructor">
+     <constructor-arg value="shiva"/>
+	 <constructor-arg value="977327"/>                     //here hostelref param will be initialized internally using "byType" autowire concept.
+	</bean> 
+
+
+Annotations:
+-----------
+-> To reduce XML config file writing, we use Annotations. Using annotations we can completely remove XML files.
+
+@Component
+@Configuration
+@ComponentScan
+@Bean
+@Required
+@Transactional
+
+Plain JDBC:
+----------
+Usually below are the steps performed to execute sql query using JDBC
+  1. Class.forName("drivers")
+  2. Connection con = DriverManager.getConnection("url,username,password")
+  3. PreparedStatement ps = con.prepareStatement("query")
+  4. ps.setInt(..) , ps.setString("")
+  5. ResultSet rs = ps.executeUpdate()
+  6. con.close()
+
+whenever we do operations on DB, requesting connection to DB should be done as below
+
+  Java has connection pool mechanism i.e DataSource interface using which we can efficiently access the DB, instead of each time requesting connection to DB
+   connectionpool mechanism will get the required no of connections at once at the start of the application and will return those only when application is shutdown.
+   connectionpool internally maintains 2 maps, one Free map to make note of free connections , other consumedmap to track connections in use.
+ connection.close()  - will return the connection to connectionpool and the same will be used on future requests.
+  We have many classes implementing DataSource interface (each from diff vendor/3pp).
+  We will use BasicDataSource Class of apche or ComboPooledDataSource of 3pp vendor which implement DataSource interface.
+
+ Instead of above step 1 and step2, we implement
+
+   1. Initialize BasicDataSource object. i.e Use BasicDataSource class setter methods to set url,username,password,MaxConnections,MaxIdleTime(),..
+   2. Use DataSource ref var to get connection from connection pool.  DataSource ds; Connection con = ds.getConnection();
+   3. After completion of DB operations, it is mandatory to close the connection aquired. i.e con.close()
+
+                                      
+Spring JDBC:
+----------- 
+
+ Spring JDBC introduced JdbcTemplate to perform DB operations. This JdbcTemplate has dependancy with DataSource.
+  1. Intialize JdbcTemplate and its DataSource  (Data Source is initialized as, injecting DataSource ref into DAO implementation class and initializing it using XML config)
+        Connection con = datasource.getConnection()
+  2. Execute queries with predifined methods  
+  
+  <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />  
+	<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe" />  
+	<property name="username" value="system" />  
+	<property name="password" value="oracle" />  
+	</bean>  
+  
+  <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">  
+	<property name="dataSource" ref="ds"></property>  
+  </bean>  
+  
+  <bean id="edao" class="com.javatpoint.EmployeeDao">  
+	<property name="jdbcTemplate" ref="jdbcTemplate"></property>  
+  </bean>
+  
+  
+  
+1)	public int update(String query)    - used to insert, update and delete records.
+2)  public int update(String query,Object... args)   - used to insert, update and delete records using PreparedStatement using given arguments.
+3)  public void execute(String query)  -  used to execute DDL query.
+4)  public T execute(String sql, PreparedStatementCallback action)  - executes the query by using PreparedStatement callback.
+5)  public T query(String sql, ResultSetExtractor rse)  -  used to fetch records using ResultSetExtractor.
+6)  public List query(String sql, RowMapper rse) -  used to fetch records using RowMapper.
+
+public int saveEmployee(Employee e){  
+    String query="insert into employee values(  
+    '"+e.getId()+"','"+e.getName()+"','"+e.getSalary()+"')";  
+    return jdbcTemplate.update(query);  
+} 
+
+
+public Boolean saveEmployeeByPreparedStatement(final Employee e){  
+    String query="insert into employee values(?,?,?)";  
+    return jdbcTemplate.execute(query,new PreparedStatementCallback<Boolean>(){  
+    @Override  
+    public Boolean doInPreparedStatement(PreparedStatement ps)  
+            throws SQLException, DataAccessException {  
+              
+        ps.setInt(1,e.getId());  
+        ps.setString(2,e.getName());  
+        ps.setFloat(3,e.getSalary());  
+              
+        return ps.execute();  
+              
+    }  
+    });  
+}  
+
+
+public List<Employee> getAllEmployees(){  
+ return template.query("select * from employee",new ResultSetExtractor<List<Employee>>(){  
+    @Override  
+     public List<Employee> extractData(ResultSet rs) throws SQLException,  
+            DataAccessException {  
+      
+        List<Employee> list=new ArrayList<Employee>();  
+        while(rs.next()){  
+        Employee e=new Employee();  
+        e.setId(rs.getInt(1));  
+        e.setName(rs.getString(2));  
+        e.setSalary(rs.getInt(3));  
+        list.add(e);  
+        }  
+        return list;  
+        }  
+    });  
+  }  
+}  
+
+Here connection closing mechanism is handled by JdbcTemplate internally.
+
+plain JDBC                                                  				 Spring JDBC
+
+Application has to handle compiletime/checked exceptions                checkedexceptions are converted to runtimeexceptions( DataAccessException class which does this)  spring.dao.jar  
+need to close the connections externally								no need to close connections externally
+ResultSet will hold the result of various select query results  		some generic select methods for each of select operations
+
+ACID properties:
+   Atomicity  - All or nothing
+   Consistency  -  All databases are updated i.e state should be same
+   Isoalation  -  2 persons are trying to book a movie ticket.each person should feel he is only one booking the ticket.
+                  i.e even if 100 transactions are in progress on a database, each transaction should be isolated from other
+				  Achieved using locking. Read/Write
+   Durability   - Permenantly store the data.
+-----------------------------
+DAO - Data Access Object
+DTO - Data Transfer Object
+
+Suppose View , Controller are in machine A and Model is in machine B then, we have to create DTO to transfer Data from machine A (controller)to machine B (Model) 
+
+=======================================================================
+In plain JDBC, transactions are managed as below
+{
+con.setAutoCommit(false);
+try
+{
+sql statement1
+sql statement2
+sql statement3
+sql statement4
+sql statement5
+con.commit()
+}
+catch()
+{
+con.rollback()
+}
+}
+
+In case of dealing with multiple data bases, its difficult to handle transactions.So JTS - Java Transaction Service is used
+
+In case of multiple data bases, each database will have one data source.
+Resource manager - each data source one resource manager.
+
+Spring Transaction Management :
+=================================
+local Transaction: Working with single database. 
+
+Global Transaction:
+     A transaction spaning over more than one data source(distributed systems). In this case the drivers that we use for data base connection should support global transactions.
+     There wil be a single Transaction manager. Resource managers (in case of distributed/multiple databases), will register itself with Transaction manager.
+     If you want to use global transaction , we have ask Transaction manager to start a transaction.
+
+In Spring, we specify the transaction manager through XML file.( see the code) 
+
+    <bean id ="transactionmanager" class="org.spring.framework.jdbc.DataSourceTransactionManager">
+	   <property name = "DataSource", ref="datasource">
+	 </bean>
+    
+	<bean id= "datasource" class = "ComboPooledDataSource">
+	  <property name="URL" value="">
+	  <property name="username" value="">
+	  ......
+	</bean> 
+
+TransactionManager:
+      Programmatic Transaction Manager -  Programmatically we define transaction boundaries. (ex: tx.start , tx.commit, tx.rollback)
+	  Declarative Transaction Manager  -  Annotations based.
+     
+
+In Spring, PlatformTransactionManager is an interface, used for managing global transactions in application.
+As it is an interface, we can inject any of the available (diff vendor implementations) implementations into it.
+
+  TransactionStatus status = TransactionManagerref.getTransaction();
+  ...........
+  TransactionManagerref.commit(status)  ,  TransactionManagerref.rollback(status)
+
+
+For every Transaction we have to specify below
+
+1. Transaction Propagation Rules
+   REQUIRES_NEW   -  method should run in new transaction. Already existing transaction will be suspended and new transaction will be initiated
+   REQUIRED       -  method should run in a transaction, if already exists continous else create new transaction
+   NEVER          -  method should never run in a transaction. if exists throws exception
+   NOT_SUPPORTED  -  method should never run in a transaction, if exists suspendeds it till method execution completes
+   SUPPORTS       -  method need not to run in a transaction, but if already transaction exists it will support
+   MANDATORY      
+   NESTED
+
+2. Isolation Rules (Achieved using locking)           @Transactional(Isoalation = isolation.READ_COMMITED)
+     To avoid concurrency problems(dirty read, non-repeatable read,phantom read	)
+	 Dirty read - Reading uncommited data.
+	 non-repeatable read  - same query results different set of rows on multiple times execution
+	 Phantom read  - 2 transactions work on same rows, one updates and other reads.
+	 
+	below are 4 isolation levels (final integer constants )defined.
+	      READ_UNCOMMITED               -  1   - not recommended - all problems are present. one transaction reading uncommited data of other transaction.	
+		  READ_COMMITED                 -  2   - dirty read solved
+		  REPEATABLE_READ               -  4   - this is defaullt. Result of sql query will be locked for one transaction at a time,i.e for that particular
+		                                         transaction result is locked. so other transaction can't make changes. phantom read issue still exist.	
+		  SERIALIZABLE                  -  8   - Total table is locked by transaction T1. All problems resolved but not at all recommended as lock acquired on entire table. Performace issues.
+	 
+3. Timeouts
+
+4. Rollback Rules -  Transaction manager will rollback only if there are runtime exception but not for compile time exceptions
+
+TransactionTemplate?
+
+
+
+
+----------------------------------------------------------------------
+Spring Exception Handling:
+ 
+    Exceptions raised at server side can be handled in below ways
+
+@ExceptionHandler(value = IOException.class)
+@ControllerAdvice
+Through xml based config  ExceptionResolver class
+
+
+
+In a controller, if any of the servie throws an exception, to handle such we will a write as below
+
+   @ExceptionHandler(value=NullPointerException.class)
+   public String handleNullPointerException(Exception e)
+   {
+      //log the exception info using any of logging machanism
+	  //return "nullpointer";
+	}
+	
+//similarly 
+  	@ExceptionHandler(value=Exception.class)
+   public String handleGenericException(Exception e)
+   {
+      //log the exception info using any of logging machanism
+	  //return "generic";
+	}
+-> So based on the Exception type corresponding ExceptionHandler method will be invoked.
+
+-> If we have huge number of controller classes, in each controller we have to write such implementaion. Instead we have another way of handling using @ControllerAdvice annotation.
+
+  We will write a custom class which will handle the exceptions raised in all the controllers using ExceptionHandler methods. 
+  
+  @ControllerAdvice
+  class ExceptionHandlingClass
+  {
+	 @ExceptionHandler(value=NullPointerException.class)
+   public String handleNullPointerException(Exception e)
+   {
+      //log the exception info using any of logging machanism
+	  //return "nullpointer";
+	}
+	@ExceptionHandler(value=Exception.class)
+   public String handleGenericException(Exception e)
+   {
+      //log the exception info using any of logging machanism
+	  //return "generic";
+	}
+}
+
+-> When an Exception is raised in controller, we have to show an appropriate error page on to UI. For this we will write errorpages i.e arithmatic.jsp, nullpointer.jsp, generic.jsp..
+   These jsp pages will be shown based on the string that we return in ExceptionHandler method. 
+   
+Exception Handling through XML based configuration:   The same ControllerAdvice class logic can be implemented in xml file as follow
+
+         <bean id = "SimpleMappingExceptionResolver" class = "org.springframework...handler.SimpleMappingExceptionResolver">
+		    <property name= "exceptionMappings">
+			   <map>
+			     <entry key="NullPointerException" value="nullpointer">
+				 <entry key="ArithmaticException" value="arithmatic">
+				</map>
+				
+			</property>	
+			<property name= "defaulltErrorView" value="Exception">                //this is for handling generic exceptions
+			
+------
+If we want to handle errors in JSP pages with proper error pages, 			
+        <error-page>
+		   <location>location of error jsp page </location>
+		</error-page>
+			  
+===============================================
+
+AOP - Aspect Oriented Programming
+If an application require any services to be implemented, Spring comes with AOP. Using AOP we have to attatch services with business code
+
+A Service may need to execute before/after or both before and after business code. For Example
+    Transaction i.e Commit,Rollback.  These must be executed before and after business logic
+
+At runtime Services and Business logic are combined using a class called ProxyFactoryBean
+
+Spring AOP -  To add services to business logic at runtime. i.e separating business logic from services.
+  
+aspect	- Service
+Advice	- Service Provider
+pointcut- condition to execute aspect for business methods
+advisor	- pointcut + advice
+target  - business class object
+proxy	- combines both services and business logic and returns a proxy object. i.e a duplicate instance of business object
+
+   Normal Scenario  :    Controller -----using business class object controller calls--------->   Business logic
+   Spring AOP       :    Controller -----using proxy object, controller calls--------->   Business logic
+        
+		           proxy object - proxy will create by combining business logic with service
+
+AOP Approches:
+   - Programmatic
+   - Declarative (XML)
+   - Annotations
+
+Programmatic AOP:     Below are the interfaces.
+  - MethodBeforeAdvice
+  - AfterReturningAdvice
+  - MethodInterceptor
+  - ThrowsAdvice
+
+->Consider an Example
+  
+  class Bank
+  {
+     //Business class
+	 //int deposit(){.....}	 //business logic
+	 
+  }
+	 
+  
+MethodBeforeAdvice
+
+class Loggingbeforelogic implements MethodBeforeAdvice
+{
+   public void before(Method m , Object[] params , Object target) throws Throwable
+   {
+       //a service method 
+	   //we will provide logging mechanism. i.e we are providing logging as service
+   }
+}
+
+AfterReturningAdvice
+
+class LoggingAfterlogic implements AfterReturningAdvice
+{
+   public void afterReturning(Object returnvalue ,Method m , Object[] params , Object target) throws Throwable
+   {
+       //a service method 
+	   //we will provide logging mechanism. i.e we are providing logging as service
+	   //returnvalue parameter - this is usefull as this service executes after business logic, returnvalue contains values(if any) returned by business logic.
+   }
+}
+
+->The parameters to above methods are, in case if your service require your own input parameters for doing any introspection. These parameters can be related to business class.
+
+MethodInterceptor    - execute service before and after business logic
+
+class LogAroundService implements MethodInterceptor
+{
+    public Object invoke(MethodInvocation mi) throws Throwable
+	{
+	        Log l = LogFactory.getLog(Bank.class);
+			l.info("service before business");
+			
+			Object ret = mi.proceed();   // here control goes to Business logic method
+
+			l.info("service after business");	
+             return ret;			
+	}
+}
+-> Using MethodInvocation object, we can retrieve below values
+         mi.getArguments()     - Object[] params  
+		 mi.getClas()
+		 mi.getMethod() - Gets the method being called (business logic method).
+		 
+ThrowsAdvice -   Incase of exceptions, if we want to track information, we use ThrowsAdvice. It is a Marker Interface.
+
+class LogforExceptions implements ThrowsAdvice
+{
+    public void afterThrowing(Exception e)
+	{
+	        Log l = LogFactory.getLog(Bank.class);
+			l.info("Exception raised in business class "+e.getMessage());
+			
+	}
+}
+
+You can implement any of the below methods as per the need.
+	void afterThrowing(Exception e)
+	void afterThrowing(RemoteException e)
+	void afterThrowing(Method m , Object[] params , Object target, Exception e)
+	void afterThrowing(Method m , Object[] params , Object target, ServletException e)
+
+
+-> Now in Controller class
+   
+   Bank bobj = new Bank();   //business class object
+   
+   // list of service class objects
+   
+   Loggingbeforelogic lbl = new  Loggingbeforelogic();
+   LoggingAfterlogic  laf = new LoggingAfterlogic();
+   LogAroundService  las = new LogAroundService();
+   LogforExceptions  lfe = new LogforExceptions();
+   
+   
+   ProxyFactoryBean pfb = new ProxyFactoryBean();
+   pfb.setTarget(objectofbusinessclass);   //i.e  pfb.setTarget(bobj);
+   
+   pfb.addAdvice(serviceclassobject);  // i.e pfb.addAdvice(lbl); pfb.addAdvice(laf); pfb.addAdvice(las); pfb.addAdvice(lfe);
+   
+   Bank b = (Bank)pfb.getObject(); b.deposit();  //calling businesslogic method
+   
+ -> Required Jars list 
+      spring-aop.jar
+      spring-aspect
+	  aspectjlib
+	  aop-alliance  
+	  aspectjrt
+	  aspectweaver
+	  cglib-proxy.jar - mandatory
+--------------------
+->Declarative AOP approach:  XML based configuration
+
+ aopexample.xml
+   <beans>
+      <bean id="bobj" class="Bank"/>                                //business class object
+	  <bean id="lbl" class="Loggingbeforelogic"/>                   //service class object
+	   <bean id="pfb" class="org.springframework.aop.framework.ProxyFactoryBean">
+	     <property name="target" ref="bobj"/>
+		 <property name="interceptorName" >
+		    <list>
+			   <value>lbl</value>
+			</list>
+		 </property>
+		</bean>
+     </beans>		
+	 
+ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("aopexample);
+Bank bproxy = (Bank)context.getBean("pfb");
+bproxy.deposit();
+		 
+---------------
+pointcut :  conditions where your services needs to be executed for business.   
+
+->Business class have 2 methods method1() , method2(). But method2() doesn't require any services to be executed. To call these methods using same 
+  ProxyFactoryBean object, we need to use Pointcut.
+  
+->We create a userdefinedpointcut class  which extends any of below classes
+	StaticMethodMatcherPointcut
+	NameMatchMethodPointcut
+	
+  class DepositPointcut extends StaticMethodMatcherPointcut
+  {
+     public boolean matches(Method m, Object class)
+	 {
+	    if(m.getName().equals("deposit"))
+		  return true;
+		else
+		  return false;
+	 }
+  }
+ 
+  Earlier  Proxy object<-  add Service,Target 
+  Now      Advisor obj <-  add Service,Pointcut
+           Proxy object<-  add advisor,Target 
+
+->We extend any of below advisor classes to create advisor object.
+       DefaultPointcutAdvisor
+	   RegexpMethodPointcutAdvisor
+		   
+ Using XML based config to create Advisor object   
+   
+      <bean id="advisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+	       <property name= "advice" ref="lbl">
+		   <property name= "pointcut" ref = "DepositPointcutref">
+	  </bean>
+	  <bean id="pfb" class="org.springframework.aop.framework.ProxyFactoryBean">
+	     <property name="target" ref="bobj"/>
+		 <property name="interceptorName" >
+		    <list>
+			   <value>advisor</value>
+			</list>
+		 </property>
+		</bean>
+   
+
+ =========for spring IOC basic jars needed are
+ spring-context.jar
+ spring-core.jar
+ spring-bean.jar
+ commons-logging.jar 
+-----------------------------
+What is cross-cutting?
+
+
+->Spring ORM module help us integrate Hibernate into Spring framework, similar to JdbcTemplate, integrate jdbc with spring.
+	
+     

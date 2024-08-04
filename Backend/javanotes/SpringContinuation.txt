@@ -1,0 +1,122 @@
+Spring :
+
+  https://start.spring.io/      - spring initializr -  using springboot a high level spring application (project structure)is created, which can be downloaded.
+
+->Inversion Of Control: Instead of developer programatically creating objects for beans, spring will create it.
+->application.properties file - logging.level.org.springframework = debug
+
+Consider an example of BinarySearch algorithm. For binarySearch logic to be implemented, first elements must be 
+    in sorted order. Here sorting algorithm can be of anything, i.e Search algorithm  have dependancy with sorting algorithm.
+
+@Component  //indicates its a bean 
+public class BinarySearchImpl {
+
+@Autowired   //auto-wire byType
+private SortAlgorithm sortAlgorithm;  //initialized through Dependancy injection.
+
+public int binarySearch(int[] numbers, int numberToSearchFor) {
+
+int[] sortedNumbers = sortAlgorithm.sort(numbers);
+System.out.println(sortAlgorithm);
+// Search the array
+return 3;
+}
+//observe as we did not write either setter or constructor for property  sortAlgorithm. Still sortAlgorithm variable is initialized through Dependancy Injection.
+//Internally setter Dependancy Injection is executed.
+}
+
+
+@Component      //indicates QuickSortAlgorithm class is a bean
+public class QuickSortAlgorithm implements SortAlgorithm {}   //here SortAlgorithm is an interface with sort(..) method.
+
+@Component      //indicates BubbleSortAlgorithm class is a bean
+@Primary       
+public class BubbleSortAlgorithm implements SortAlgorithm {} //here SortAlgorithm is an interface with sort(..) method.
+
+->@Primary - In above case, we have 2 beans (sorting algorithms). sortAlgorithm variable can be initialized with any one of above 2 objects (BubbleSortAlgorithm,QuickSortAlgorithm).
+
+   Using @Primary annotation, we are indicating which bean object has to be injected into sortAlgorithm variable. If we donot use @Primary, then exception is thrown as spring cannot understand which bean has to be injected at runtime.
+
+->auto-wire by Name Usage:
+    @Autowired   
+private SortAlgorithm BubbleSortAlgorithm;  //initialized through Dependancy injection with BubbleSortAlgorithm class object.
+
+@Autowired   
+private SortAlgorithm QuickSortAlgorithm;  //initialized through Dependancy injection with QuickSortAlgorithm class object.
+
+In the above case, we donot need to Use @Primary annotation, as we are using auto-wire by Name. variable name itself indicated which bean object needs to injected.
+---
+Consider below case   
+  @Component      
+  public class QuickSortAlgorithm implements SortAlgorithm {}   
+
+  @Component      
+  @Primary       
+  public class BubbleSortAlgorithm implements SortAlgorithm {} 
+
+In BinarySearchImpl class
+@Autowired   
+private SortAlgorithm QuickSortAlgorithm;  //observe cleary auto-wire by Name.notice variable name.
+
+-> QuickSortAlgorithm property is initialized with which bean object BubbleSortAlgorithm or QuickSortAlgorithm ??
+         answer: BubbleSortAlgorithm. Because "@Primary" annotation has higher priority over "auto-wire by Name"
+
+-----
+@SpringBootApplication
+public class SpringIn5StepsApplication {
+
+public static void main(String[] args) {
+
+ApplicationContext applicationContext = 
+SpringApplication.run(SpringIn5StepsApplication.class, args);
+BinarySearchImpl binarySearch = 
+applicationContext.getBean(BinarySearchImpl.class);
+ 
+----
+->@Qualifier("....")
+
+Consider below case   
+      @Component
+  @Qualifier("quick")
+  public class QuickSortAlgorithm implements SortAlgorithm {}   
+
+  @Component      
+  @Qualifier("sort")       
+  public class BubbleSortAlgorithm implements SortAlgorithm {} 
+
+In BinarySearchImpl class
+@Autowired 
+@Qualifier("quick")
+private SortAlgorithm sortAlgorithm;  //observe cleary. sortAlgorithm will be initialized with QuickSortAlgorithm bean object
+
+---------------
+@Scope("prototype")  OR  @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)  - one object for application context not for jvm
+
+In the above example, scope is singleton. i.e every time we request BinarySearchImpl object, spring returns the same object. Also its the same for  QuickSortAlgorithm,BubbleSortAlgorithm objects. But if i need to change the scope of BubbleSortAlgorithm object i.e different BubbleSortAlgorithm objects for the same BinarySearchImpl object, then
+ 
+     @Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE, 
+        proxyMode = ScopedProxyMode.TARGET_CLASS)
+      public class BubbleSortAlgorithm implements SortAlgorithm {} 
+--------------------
+@ComponentScan("fullyqualifiedpackagename")   
+    In a large enterprise application, we will have so many classes created under different packages. To make sure spring to find the class while creating the objects using context, we need to use @ComponentScan("") for the class which is not in the package where applicationContext.getBean("") is called.
+
+@ComponentScan("com.in28minutes.spring.basics.componentscan")
+    public class BubbleSortAlgorithm implements SortAlgorithm {}
+
+->->In case of XML based configuration
+     <context:component-scan base-package="fullyqualifiedpackagename"/>   - mentioned in XML file at the begining
+-----------------------
+@PostConstruct         (init-method)
+public void postConstruct() {
+	logger.info("postConstruct"); //called when post construction of beans, after all dependancies of that bean are injected
+}
+
+@PreDestroy      (destroy-method)
+public void preDestroy() {
+	logger.info("preDestroy"); //when bean is removed
+}
+---------------- 
+https://github.com/in28minutes/spring-master-class/tree/master/01-spring-in-depth         -  code files
+================================================================================
+
