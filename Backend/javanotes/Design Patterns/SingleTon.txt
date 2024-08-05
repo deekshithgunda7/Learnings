@@ -1,0 +1,26 @@
+1. Singleton Pattern
+
+Ensures a class has only one instance and provides a global point of access to it.
+
+Example: Logging Service
+
+In a banking application, you might have a logging service to track all transactions and events. Using the Singleton pattern ensures there is only one instance of the logging service throughout the application.
+
+public class LoggingService {
+    private static LoggingService instance;
+    
+    private LoggingService() {
+        // Private constructor to prevent instantiation
+    }
+    
+    public static synchronized LoggingService getInstance() {
+        if (instance == null) {
+            instance = new LoggingService();
+        }
+        return instance;
+    }
+    
+    public void log(String message) {
+        // Log message
+    }
+}

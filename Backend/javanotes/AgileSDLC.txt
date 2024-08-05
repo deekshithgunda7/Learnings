@@ -1,0 +1,78 @@
+Agile Software Development Life Cycle (SDLC) is an iterative and incremental approach to software development that emphasizes flexibility, collaboration, and customer feedback. It focuses on delivering small, workable pieces of software frequently, rather than a single large release at the end. Here’s an overview of the Agile SDLC with its key phases:
+
+1. Concept/Initiation
+Objective: Define the project scope, objectives, and high-level requirements.
+Activities:
+Identify stakeholders and form the Agile team.
+Define the project vision and goals.
+Create an initial product backlog with high-level user stories.
+Estimate the effort and resources required.
+Example: For a banking application, this phase might involve defining the need for a new mobile banking feature that allows customers to view their account balances and recent transactions.
+
+2. Inception/Planning
+Objective: Plan the work for the upcoming sprints, prioritize backlog items, and set up the project environment.
+Activities:
+Hold a planning meeting to prioritize the product backlog.
+Define the sprint goal and select user stories for the first sprint.
+Estimate tasks and assign them to team members.
+Set up tools and environments needed for development.
+Example: Planning the first sprint to focus on developing the user interface for the new mobile banking feature, such as login and dashboard screens.
+
+3. Iteration/Development
+Objective: Develop the software in iterative cycles (sprints), typically lasting 2-4 weeks.
+Activities:
+Daily stand-up meetings to discuss progress and obstacles.
+Develop features and functionalities as per the sprint backlog.
+Continuous integration and testing of code.
+Collaborate and refine user stories as needed.
+Example: Developers and testers work on implementing and testing the login functionality, integrating with the bank’s authentication system, and ensuring it works across different devices.
+
+4. Release
+Objective: Deliver a potentially shippable product increment at the end of each sprint.
+Activities:
+Conduct sprint review meetings to demonstrate the completed work to stakeholders.
+Collect feedback and make necessary adjustments to the product backlog.
+Deploy the increment to a staging or production environment if applicable.
+Example: Demonstrating the new login feature to stakeholders and deploying it to a staging environment for further testing and feedback.
+
+5. Maintenance
+Objective: Maintain and support the software post-deployment, addressing bugs and making minor enhancements.
+Activities:
+Monitor the application in the production environment.
+Fix bugs and issues reported by users.
+Plan for minor enhancements based on user feedback.
+Example: Monitoring the mobile banking application for login issues and fixing any bugs that users report, ensuring a smooth user experience.
+
+6. Retirement
+Objective: Safely decommission or replace the application or a part of it.
+Activities:
+Inform stakeholders and users about the end-of-life plan.
+Migrate data and functionalities to the new system if applicable.
+Archive necessary data and documentation.
+Example: Decommissioning an old version of the mobile banking app after migrating all users to the new version with the enhanced login feature.
+
+Agile Principles in Practice
+
+Customer Collaboration: Continuous involvement of stakeholders and customers for feedback.
+Working Software: Delivering functional software at the end of each sprint.
+
+Responding to Change: Flexibility to accommodate changes even late in the development process.
+Individuals and Interactions: Emphasis on team collaboration and communication.
+
+Agile Roles
+Product Owner: Represents the stakeholders and customers, prioritizes the backlog.
+Scrum Master: Facilitates the Agile process, removes obstacles, and ensures the team follows Agile practices.
+Development Team: Cross-functional team members who design, develop, test, and deliver the product increment.
+
+Agile Artifacts
+Product Backlog: Ordered list of all desired work on the project, including features, enhancements, bug fixes, etc.
+Sprint Backlog: List of tasks and user stories selected for a sprint.
+Increment: The sum of all completed product backlog items at the end of a sprint.
+
+Agile Ceremonies
+Sprint Planning: Meeting to plan the work for the upcoming sprint.
+Daily Stand-Up: Short, daily meetings to discuss progress and obstacles.
+Sprint Review: Meeting to demonstrate the work completed in the sprint.
+Sprint Retrospective: Meeting to reflect on the sprint and identify improvement areas.
+
+By following the Agile SDLC, a banking software development team can ensure rapid delivery of valuable features, adapt to changing requirements, and continuously improve through iterative feedback and collaboration.

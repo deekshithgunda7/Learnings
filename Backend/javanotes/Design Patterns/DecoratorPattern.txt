@@ -1,0 +1,58 @@
+Decorator Pattern
+Allows behavior to be added to an individual object, dynamically, without affecting the behavior of other objects from the same class.
+
+Example: Transaction Processing
+Additional behavior such as logging and security checks can be added to the transaction processing dynamically.
+
+
+public interface Transaction {
+    void process();
+}
+
+public class BasicTransaction implements Transaction {
+    public void process() {
+        // Basic transaction processing
+    }
+}
+
+public abstract class TransactionDecorator implements Transaction {
+    protected Transaction decoratedTransaction;
+    
+    public TransactionDecorator(Transaction decoratedTransaction) {
+        this.decoratedTransaction = decoratedTransaction;
+    }
+    
+    public void process() {
+        decoratedTransaction.process();
+    }
+}
+
+public class LoggingTransactionDecorator extends TransactionDecorator {
+    public LoggingTransactionDecorator(Transaction decoratedTransaction) {
+        super(decoratedTransaction);
+    }
+    
+    public void process() {
+        decoratedTransaction.process();
+        log();
+    }
+    
+    private void log() {
+        // Log transaction
+    }
+}
+
+public class SecurityTransactionDecorator extends TransactionDecorator {
+    public SecurityTransactionDecorator(Transaction decoratedTransaction) {
+        super(decoratedTransaction);
+    }
+    
+    public void process() {
+        checkSecurity();
+        decoratedTransaction.process();
+    }
+    
+    private void checkSecurity() {
+        // Perform security checks
+    }
+}

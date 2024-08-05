@@ -1,0 +1,36 @@
+Factory Method Pattern
+
+Defines an interface for creating an object but allows subclasses to alter the type of objects that will be created.
+
+Example: Transaction Factory
+In a banking system, different types of transactions (deposit, withdrawal, transfer) can be created using a factory method.
+
+
+public abstract class Transaction {
+    public abstract void process();
+}
+
+public class DepositTransaction extends Transaction {
+    public void process() {
+        // Process deposit
+    }
+}
+
+public class WithdrawalTransaction extends Transaction {
+    public void process() {
+        // Process withdrawal
+    }
+}
+
+public class TransactionFactory {
+    public static Transaction createTransaction(String type) {
+        switch (type) {
+            case "deposit":
+                return new DepositTransaction();
+            case "withdrawal":
+                return new WithdrawalTransaction();
+            default:
+                throw new IllegalArgumentException("Unknown transaction type");
+        }
+    }
+}

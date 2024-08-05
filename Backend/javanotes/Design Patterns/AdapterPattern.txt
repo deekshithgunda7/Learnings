@@ -1,0 +1,31 @@
+Adapter Pattern:
+
+Allows incompatible interfaces to work together. The adapter pattern acts as a bridge between two incompatible interfaces.
+
+Example: Legacy System Integration
+Suppose you need to integrate a modern banking application with a legacy system that has a different interface for processing transactions.
+
+// Legacy system interface
+public class LegacyTransactionSystem {
+    public void execute(String transactionType) {
+        // Execute transaction in the legacy system
+    }
+}
+
+// New system interface
+public interface NewTransactionSystem {
+    void processTransaction();
+}
+
+// Adapter class to integrate with the legacy system
+public class LegacyTransactionAdapter implements NewTransactionSystem {
+    private LegacyTransactionSystem legacySystem;
+    
+    public LegacyTransactionAdapter(LegacyTransactionSystem legacySystem) {
+        this.legacySystem = legacySystem;
+    }
+    
+    public void processTransaction() {
+        legacySystem.execute("process");
+    }
+}
